@@ -31,8 +31,10 @@ target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils PRIVATE cereal::c
 
 target_precompile_headers(cpp_cached PUBLIC stdafx.h)
 
-add_subdirectory(tests)
-enable_testing()
+if (NOT "${cpp_cached_BUILD_TESTS}" STREQUAL "OFF")
+    add_subdirectory(tests)
+    enable_testing()
+endif()
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out )

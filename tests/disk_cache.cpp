@@ -9,6 +9,8 @@ TEST_CASE("disk", "[cache][hide]") {
 	DiskCache c;
 	using vi = std::vector<int>;
 	vi v(75);
+	for (size_t i = 0; i < 75; i++)
+		v[i] = i;
 	c.push("1", v);
 	c.push("2", v);
 	std::string big_name;
