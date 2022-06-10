@@ -2,7 +2,7 @@
 
 #pragma warning(disable:4251)
 
-#if defined(_WIN32) || defined(WIN32)
+#if (defined(_WIN32) || defined(WIN32)) && defined(BUILD_SHARED_LIBS)
     #ifdef cpp_cached_EXPORTS
         #define cpp_cached_API __declspec(dllexport)
     #else
