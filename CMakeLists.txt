@@ -21,13 +21,14 @@ include(${rr_cmake_SOURCE_DIR}/rr_cmake/common.cmake)
 git_include(cpp_rutils "https://github.com/reder2000/cpp_rutils.git")
 
 find_vcpkg_install_missing(cereal)
+find_vcpkg_install_missing(SQLiteCpp)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 file(GLOB srcs CONFIGURE_DEPENDS  *.h *.cpp)
 
 add_library (cpp_cached STATIC  ${srcs})
 
-target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils PRIVATE cereal::cereal)
+target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils PRIVATE cereal::cereal SQLiteCpp)
 
 target_precompile_headers(cpp_cached PUBLIC stdafx.h)
 

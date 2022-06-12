@@ -1,4 +1,4 @@
-#include "../disk_cache.h"
+#include "../disk.h"
 
 #define CATCH_CONFIG_ALL_PARTS
 #include <catch2/catch_test_macros.hpp>

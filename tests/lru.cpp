@@ -1,4 +1,4 @@
-#include "../lru_cache.h"
+#include "../lru.h"
 
 #define CATCH_CONFIG_ALL_PARTS
 #include <catch2/catch_test_macros.hpp>

@@ -62,13 +62,13 @@ std::string to_conformant(const std::string& key) {
 
 std::string split_long_filename(const std::string& key) {
 	size_t first = 0;
-	size_t last = std::min<size_t>(key.size(),240);
+	size_t last = std::min<size_t>(key.size(), 240);
 	std::string res(key.begin(), key.begin() + last);
 	for (; last < key.size();) {
 		res += std::filesystem::path::preferred_separator;
 		first = last;
-		last = std::min<size_t>(key.size(), last+240);
-		res += std::string(key.begin()+first, key.begin() + last);
+		last = std::min<size_t>(key.size(), last + 240);
+		res += std::string(key.begin() + first, key.begin() + last);
 	}
 	return res;
 
@@ -89,7 +89,7 @@ DiskCache::DiskCache(const path& root_path) :
 	time_t tt;
 	time(&tt);
 	struct tm tm;
-	localtime_s(&tm,&tt);
+	localtime_s(&tm, &tt);
 	auto s = fmt::format("{:%Y-%m-%d}", tm);
 	_root_path.append(s);
 }
@@ -102,7 +102,7 @@ bool DiskCache::has(const std::string& key) const
 }
 
 std::filesystem::path DiskCache::get_full_path_splitted(const std::string& key) const
-{	
+{
 	auto res = ::get_full_path(_root_path, key);
 	return res;
 }
