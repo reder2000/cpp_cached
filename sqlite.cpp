@@ -67,7 +67,7 @@ size_t SqliteCache::total_size(Database& db) const
 
 void SqliteCache::clean_expired(Database& db)
 {
-	int64_t cnow = std::chrono::utc_clock::now().time_since_epoch().count();
+	int64_t cnow = std__chrono::utc_clock::now().time_since_epoch().count();
 
 	Statement query(db, "DELETE FROM cache WHERE expire_time < ?");
 	query.bind(1, cnow);

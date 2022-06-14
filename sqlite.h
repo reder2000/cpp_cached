@@ -5,11 +5,13 @@
 #include "cache_imp_exp.h"
 
 #include <filesystem>
+#include <optional>
 #include <cpp_rutils/literals.h>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <SQLiteCpp/VariadicBind.h>
 #include <cpp_rutils/require.h>
 #include <cpp_rutils/memstream.h>
+#include <cpp_rutils/date.h>
 #include <cereal/archives/binary.hpp>
 
 // sqlite cache parameters:
@@ -22,7 +24,7 @@ class cpp_cached_API SqliteCache {
 
 public:
 
-	using duration = std::chrono::utc_clock::duration;
+	using duration = std__chrono::utc_clock::duration;
 	static constexpr duration max_duration = duration(std::numeric_limits<int64_t>::max());
 	static std::filesystem::path default_root_path() {
 		return
@@ -77,7 +79,7 @@ std::optional<T> SqliteCache::get( const char* key)
 		return res;
 	auto values = query.getColumns<cache_row_value, 6>();
 	duration expire_time = duration(values.expire_time);
-	std::chrono::utc_clock::time_point now = std::chrono::utc_clock::now();
+	std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
 	duration dnow = now.time_since_epoch();
 	// remove row if expired
 	if (dnow>expire_time)
@@ -109,7 +111,7 @@ void SqliteCache::set(const char* key, const T& value, const duration& d)
 {
 	using namespace  SQLite;
 	cache_row_value values{};
-	values.store_time = std::chrono::utc_clock::now().time_since_epoch().count();
+	values.store_time = std__chrono::utc_clock::now().time_since_epoch().count();
 	values.expire_time = d.count();
 	values.access_time = values.store_time;
 	auto db = get_db();
