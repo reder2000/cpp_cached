@@ -58,11 +58,14 @@ public:
 
 	using duration = std::chrono::utc_clock::duration;
 	static constexpr duration max_duration = duration(std::numeric_limits<int64_t>::max());
-
+	static std::filesystem::path default_root_path() {
+		return
+			std::filesystem::temp_directory_path().append("cache").append("sqlite");
+	}
 
 	SqliteCache(const std::filesystem::path& root_path =
 		std::filesystem::temp_directory_path().append("cache").append("sqlite"),
-		uint64_t size = 2_GB);
+		uint64_t max_size = 2_GB);
 
 	SQLite::Database get_db(bool create_tables=false);
 
@@ -77,17 +80,18 @@ public:
 private:
 
 	std::filesystem::path _root_path, _db_name;
-	uint64_t _size;
+	uint64_t _max_size;
 
 	size_t total_size(SQLite::Database &db) const;
-
+	void clean_expired(SQLite::Database& db);
+	void clean_older(SQLite::Database& db, int64_t need_to_free);
 };
 
 
 using namespace  SQLite;
 
-SqliteCache::SqliteCache(const std::filesystem::path& root_path, uint64_t size) :
-	_root_path(root_path) , _size(size)
+SqliteCache::SqliteCache(const std::filesystem::path& root_path, uint64_t max_size) :
+	_root_path(root_path) , _max_size(max_size)
 {
 	_db_name = _root_path / "cache.db";
 	//_db_name /= "cache.db";
@@ -164,15 +168,15 @@ size_t SqliteCache::total_size(SQLite::Database &db) const
 //{
 //	return { Column(query.mStmtPtr, Is)... };
 //}
-template<int N>
-auto mgetColumns(Statement& query)
-{
-	//	query.checkRow();
-	//	query.checkIndex(N - 1);
-	//return rmgetColumns(query, std::make_integer_sequence<int, N>{});
-	return query.getColumns<Column, N>();
-}
-
+//template<int N>
+//auto mgetColumns(Statement& query)
+//{
+//	//	query.checkRow();
+//	//	query.checkIndex(N - 1);
+//	//return rmgetColumns(query, std::make_integer_sequence<int, N>{});
+//	return query.getColumns<Column, N>();
+//}
+//
 
 
 template <class T> inline
@@ -197,16 +201,53 @@ std::optional<T> SqliteCache::get( const char* key)
 		query.exec();
 		return res;
 	}
-	// get blob & update values
+	// get blob
 	auto col_blob = query.getColumn(6);
 	imemstream sin( reinterpret_cast<const char*>(col_blob.getBlob()),col_blob.size() );
 	cereal::BinaryInputArchive archive(sin);
 	T tmp;
 	archive( tmp );
 	res = tmp;
-	return res; 
+	// update counters
+	Statement query2(db, "UPDATE cache SET access_count = access_count + 1 WHERE key=?");
+	query2.bind(1, key);
+	query2.exec();
+	Statement query3(db, "UPDATE cache SET access_time = ? WHERE key=?");
+	bind(query3, dnow.count(), key);
+	query3.exec();
+	return res;
 }
 
+void SqliteCache::clean_expired(Database &db)
+{
+	int64_t cnow = std::chrono::utc_clock::now().time_since_epoch().count();
+
+	Statement query(db,"DELETE FROM cache WHERE expire_time < ?");
+	query.bind(1, cnow);
+	query.exec();
+	//std::vector<std::string> keys;
+	//while (query.executeStep())
+	//{
+	//	keys.push_back(query.getColumn(0).getString());
+	//}
+	//query.reset();
+}
+
+void SqliteCache::clean_older(SQLite::Database& db, int64_t need_to_free)
+{
+
+	Statement query(db, "SELECT key,sIzE FROM cache ORDER BY store_time");
+	int64_t fred = 0;
+	while (query.executeStep() && fred<need_to_free)
+	{
+		auto key = query.getColumn(0).getString();
+		auto sz = query.getColumn(1).getInt64();
+		fred += sz;
+		Statement query2(db, "DELETE FROM cache where key=?");
+		query2.bind(1, key);
+		query2.exec();
+	}
+}
 
 template <class T>
 void SqliteCache::set(const char* key, const T& value, const duration& d)
@@ -221,6 +262,14 @@ void SqliteCache::set(const char* key, const T& value, const duration& d)
 	cereal::BinaryOutputArchive archive(out);
 	archive(value);
 	int sz = out.str().size();
+	int ts = total_size(db);
+	if ((ts+sz)>_max_size)		// reclaim expired
+		clean_expired(db);
+	ts = total_size(db);
+	if ((ts + sz) > _max_size) {		// reclaim old
+		int64_t need_to_free = (ts + sz) - _max_size;
+		clean_older(db, need_to_free);
+	}
 	bind(query, key, values.store_time, values.expire_time, values.access_time, values.accesss_count, sz);
 	query.bind( 7, reinterpret_cast<const void*>(out.str().c_str()), sz);
 	query.exec();

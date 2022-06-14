@@ -6,12 +6,10 @@
 
 
 TEST_CASE("sqlite", "[cache][hide]") {
-	SqliteCache cache{};
-	cache.get_db();
-	//auto start = std::chrono::utc_clock::now();
-
-	int value = 2;
-	cache.set("toto", value);
-
-	auto res = cache.get<int>("toto");
+	SqliteCache cache{ SqliteCache::default_root_path(), 200  };
+	for (int i = 0; i < 20; i++) {
+		std::vector<int> toto = { i,i + 1 };
+		std::string key = std::to_string(i);
+		cache.set(key.c_str(), toto);
+	}
 }
