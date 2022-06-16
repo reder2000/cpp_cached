@@ -11,7 +11,7 @@ add_executable(cached_tests ${srcs})
 
 target_link_libraries(cached_tests Catch2::Catch2WithMain cpp_cached)
 
-target_precompile_headers(cached_tests PUBLIC    stdafx.h)
+target_precompile_headers(cached_tests PRIVATE stdafx.h)
 add_definitions(-DUSING_PCH)
 
 enable_testing()

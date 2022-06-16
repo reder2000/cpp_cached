@@ -1,4 +1,4 @@
-#include "../sqlite.h"
+#include "../cpp_cached/sqlite.h"
 
 #define CATCH_CONFIG_ALL_PARTS
 #include <catch2/catch_test_macros.hpp>

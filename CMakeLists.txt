@@ -24,13 +24,13 @@ find_vcpkg_install_missing(cereal)
 find_vcpkg_install_missing(SQLiteCpp)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-file(GLOB srcs CONFIGURE_DEPENDS  *.h *.cpp)
+file(GLOB srcs CONFIGURE_DEPENDS  cpp_cached/*.h cpp_cached/*.cpp)
 
 add_library (cpp_cached STATIC  ${srcs})
 
 target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils PRIVATE cereal::cereal SQLiteCpp)
 
-target_precompile_headers(cpp_cached PUBLIC stdafx.h)
+target_precompile_headers(cpp_cached PRIVATE stdafx.h)
 
 if ("${BUILD_SHARED_LIBS}" STREQUAL "ON")
     message("Building shared ${CMAKE_PROJECT_NAME}")
