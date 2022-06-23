@@ -48,13 +48,22 @@ Database SqliteCache::get_db(bool create_tables)
 	return db;
 }
 
-bool SqliteCache::contains(const char* key)
+bool SqliteCache::has(const std::string& key)
 {
 	auto db = get_db();
 	Statement query(db, "SELECT key FROM cache WHERE key = ?");
 	query.bind(1, key);
-	return query.exec() != 0 ;
+	return query.executeStep() != 0 ;
 
+}
+
+void SqliteCache::erase(const std::string& key)
+{
+	if (!has(key)) return;
+	auto db = get_db();
+	Statement query(db, "DELETE FROM cache where key=?");
+	query.bind(1, key);
+	query.exec();
 }
 
 size_t SqliteCache::total_size(Database& db) const
@@ -94,4 +103,19 @@ void SqliteCache::clean_older(Database& db, int64_t need_to_free)
 		query2.bind(1, key);
 		query2.exec();
 	}
+}
+
+SqliteCache::time_point last_point_of_today()
+{
+  auto now               = std__chrono::utc_clock::now();
+  auto nowsys            = std__chrono::utc_clock::to_sys(now);
+  auto nowsystmt         = std__chrono::system_clock::to_time_t(nowsys);
+  auto nowsysstructtm    = to_<struct tm>::_(nowsystmt);
+  nowsysstructtm.tm_hour = 23;
+  nowsysstructtm.tm_min  = 59;
+  nowsysstructtm.tm_sec  = 59;
+  nowsystmt              = to_<time_t>::_(nowsysstructtm);
+  nowsys                 = std__chrono::system_clock::from_time_t(nowsystmt);
+  auto now_midnight          = std__chrono::utc_clock::from_sys(nowsys);
+  return now_midnight;
 }

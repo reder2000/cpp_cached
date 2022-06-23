@@ -12,4 +12,5 @@ TEST_CASE("sqlite", "[cache][hide]") {
 		std::string key = std::to_string(i);
 		cache.set(key.c_str(), toto);
 	}
+	cache.get< std::vector<int>>("1");
 }

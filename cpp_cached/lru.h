@@ -16,12 +16,14 @@ public:
 	void resize(size_t maximum_memory);
 
 	template <class T>
-	void push(const std::string& key, const T& value);
+	void set(const std::string& key, const T& value);
 
-	bool has(const std::string& key) const; 
+	bool has(const std::string& key);
+
+	void erase(const std::string& key);
 
 	template <class T>
-	const T& get(const std::string& key) const;
+	const T& get(const std::string& key);
 
 private:
 
@@ -40,7 +42,7 @@ private:
 	size_t _maximum_memory;
 	size_t _current_memory;
 
-	const entry& _get(const std::string& key) const;
+	const entry& _get(const std::string& key) ;
 
 	void reclaim(size_t memory)  ;
 
@@ -48,40 +50,12 @@ private:
 	lru_type _list;
 };
 
-inline
-LRU_cache::LRU_cache(size_t maximum_memory) :
-	_maximum_memory(maximum_memory), _current_memory(0)
-{}
-
-inline void LRU_cache::resize(size_t maximum_memory)
-{
-	if (maximum_memory < _maximum_memory)
-		reclaim(_maximum_memory - maximum_memory);
-	_maximum_memory = maximum_memory;
-}
-
-inline
-bool LRU_cache::has(const std::string& key) const {
-	return _map.find(key) != _map.end();
-}
-
-inline const  LRU_cache::entry & LRU_cache::_get(const std::string& key) const
+inline const  LRU_cache::entry & LRU_cache::_get(const std::string& key) 
 {
 	MREQUIRE( has(key) , "{} does not exits", key);
 	return const_cast<map_type*>(&_map)->operator[](key);
 }
 
-inline void LRU_cache::reclaim(size_t memory) 
-{
-	while ((memory + _current_memory) > _maximum_memory && !_list.empty()) {
-		const std::string & key = _list.back();
-		auto i = _map.find(key);
-		_current_memory -= i->second._mem_used;
-		_map.erase(i);
-		_list.pop_back();
-	} 
-	;
-}
 
 template<class T>
 inline LRU_cache::entry::entry(const T& value) :
@@ -91,7 +65,7 @@ inline LRU_cache::entry::entry(const T& value) :
 }
 
 template<class T>
-inline void LRU_cache::push(const std::string& key, const T& value)
+inline void LRU_cache::set(const std::string& key, const T& value)
 {
 	MREQUIRE(!has(key), " {} already exists ", key);
 	entry new_entry(value);
@@ -102,7 +76,7 @@ inline void LRU_cache::push(const std::string& key, const T& value)
 }
 
 template<class T>
-inline const T& LRU_cache::get(const std::string& key) const
+inline const T& LRU_cache::get(const std::string& key)
 {
 	return std::any_cast<const T&>(_get(key)._value);
 }
