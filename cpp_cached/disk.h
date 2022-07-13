@@ -9,14 +9,7 @@
 #include <filesystem>
 #include <cereal/archives/binary.hpp>
 #include <fstream>
-//#include <Shlobj.h>
-#if defined(__GNUC__)
-	#include <string.h>
-	template <size_t sz>
-	inline void _strerror_s(char(& buffer)[sz] , char const* error_msg) {
-		strerror_r(errno,buffer,sz);
-	}
-#endif
+#include <cpp_rutils/secure_deprecate.h>
 
 
 class cpp_cached_API DiskCache {
@@ -60,9 +53,7 @@ inline void DiskCache::push(const std::string& key, const T& value)
 		archive(value);
 	}
 	catch (std::system_error& e) {
-		char buffer[500];
-		_strerror_s(buffer, nullptr);
-		std::cerr << buffer << std::endl;
+		std::cerr << m_strerror_s(errno) << std::endl;
 		//std::cerr << e.code().message() << std::endl;
 		throw;
 	}

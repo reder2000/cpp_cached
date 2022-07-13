@@ -3,9 +3,6 @@
 #include <fmt/chrono.h>
 #include <cpp_rutils/literals.h>
 
-#if defined(__GNUC__) || defined(__linux__)
-#define localtime_s(a,b) localtime_r(b,a)
-#endif
 #if defined(__GNUC__) 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
