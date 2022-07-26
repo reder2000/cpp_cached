@@ -85,8 +85,7 @@ DiskCache::DiskCache(const path& root_path) :
 {
 	time_t tt;
 	time(&tt);
-	struct tm tm;
-	localtime_s(&tm, &tt);
+	struct tm tm = m_localtime_s(tt);
 	auto s = fmt::format("{:%Y-%m-%d}", tm);
 	_root_path.append(s);
 }
