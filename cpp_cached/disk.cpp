@@ -49,7 +49,7 @@ const mapped_table& get_mapped_table() {
 
 std::string to_conformant(const std::string& key) {
 	auto& mt = get_mapped_table();
-	auto bad_char = std::find_if(key.begin(), key.end(), [&](const unsigned char& c) {return mt[c].size() == 0; });
+	auto bad_char = std::find_if(key.begin(), key.end(), [&](const unsigned char& c) {return mt[c].empty(); });
 	MREQUIRE(bad_char == key.end(), "invalid input char {}", *bad_char);
 	std::string res;
 	for (unsigned char c : key)

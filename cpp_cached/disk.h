@@ -22,7 +22,7 @@ public:
 	template <class T>
 	void push(const std::string& key, const T& value);
 
-	bool has(const std::string& key) const; 
+	[[nodiscard]] bool has(const std::string& key) const;
 
 	template <class T>
 	T get(const std::string& key) const;
@@ -31,7 +31,7 @@ private:
 
 	std::filesystem::path _root_path;
 	
-	std::filesystem::path get_full_path_splitted(const std::string& key) const;
+	[[nodiscard]] std::filesystem::path get_full_path_splitted(const std::string& key) const;
 
 
 };

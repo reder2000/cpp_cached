@@ -28,9 +28,9 @@ public:
 private:
 
 	struct entry {
-		entry() = default;
+		entry() : _mem_used(0) {}
 		template <class T>
-		entry(const T& value);
+		explicit entry(const T& value);
 
 		std::any _value;
 		size_t _mem_used;
