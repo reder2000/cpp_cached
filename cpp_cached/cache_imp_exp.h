@@ -1,5 +1,7 @@
 #pragma once
 
+// used for buiding a shared library
+
 #pragma warning(disable:4251)
 
 #if (defined(_WIN32) || defined(WIN32)) && defined(BUILD_SHARED_LIBS)

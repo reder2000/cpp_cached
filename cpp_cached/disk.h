@@ -1,5 +1,8 @@
 #pragma once 
 
+// disk cache that writes each cache entry as a file on disk
+// needs long file name support
+
 #include "cache_imp_exp.h"
 #include <unordered_map>
 #include <any>

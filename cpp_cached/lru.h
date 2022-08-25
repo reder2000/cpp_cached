@@ -1,17 +1,23 @@
 #pragma once 
 
+// memory cache with maximum allocated memory
+// objects to be stored should provide some help
+// in measuring how much memory they use
+
+
 #include <unordered_map>
 #include <any>
 #include <list>
 #include <cpp_rutils/memory_size.h>
 #include <cpp_rutils/require.h>
+#include <cpp_rutils/literals.h>
 #include "cache_imp_exp.h"
 
 class cpp_cached_API LRU_cache {
 
 public:
 
-	LRU_cache(size_t maximum_memory = 1024 * 1024);
+	LRU_cache(size_t maximum_memory = 1_GB );
 
 	void resize(size_t maximum_memory);
 
