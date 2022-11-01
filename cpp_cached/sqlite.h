@@ -126,18 +126,19 @@ inline void SqliteCache::set(const std::string& key, const T& value, time_point 
 	std::ostringstream out;
 	cereal::BinaryOutputArchive archive(out);
 	archive(value);
-	int sz = static_cast<int>(out.str().size());
-	int ts = static_cast<int>(total_size(db));
-	if (((size_t)ts + sz) > _max_size) // reclaim expired
+	size_t  sz = out.str().size();
+	size_t ts = total_size(db);
+	if ((ts + sz) > _max_size) // reclaim expired
 		clean_expired(db);
 	ts = total_size(db);
-	if (((size_t)ts + sz) > _max_size)
+	if ((ts + sz) > _max_size)
 	{ // reclaim old
 		int64_t need_to_free = (ts + sz) - _max_size;
 		clean_older(db, need_to_free);
 	}
-	bind(query, key.c_str(), values.store_time, values.expire_time, values.access_time, values.accesss_count, sz);
-	query.bind(7, reinterpret_cast<const void*>(out.str().c_str()), sz);
+    int i_sz = static_cast<int>(sz);
+	bind(query, key.c_str(), values.store_time, values.expire_time, values.access_time, values.accesss_count, i_sz);
+	query.bind(7, reinterpret_cast<const void*>(out.str().c_str()), i_sz);
 	query.exec();
 }
 
