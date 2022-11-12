@@ -18,7 +18,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(rr_cmake)
 include(${rr_cmake_SOURCE_DIR}/rr_cmake/common.cmake)
 
-git_include(cpp_rutils "https://github.com/reder2000/cpp_rutils.git")
+git_include(cpp_rutils "https://github.com/reder2000/cpp_rutils.git" BRANCH dev)
 
 find_vcpkg_install_missing(cereal)
 find_vcpkg_install_missing(SQLiteCpp)
