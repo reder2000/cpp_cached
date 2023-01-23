@@ -5,7 +5,7 @@ project ("cpp_cached" VERSION 0.1.0
              HOMEPAGE_URL "https://github.com/reder2000/cpp_cached")
 
 
-message("Configuring ${CMAKE_PROJECT_NAME} ...")
+message("Configuring cpp_cached ...")
 
 include(FetchContent)
 FetchContent_Declare(
@@ -45,4 +45,4 @@ if (NOT "${cpp_cached_BUILD_TESTS}" STREQUAL "OFF")
 endif()
 
 	
-message("... ${CMAKE_PROJECT_NAME} configuring done")
+message("... cpp_cached configuring done")

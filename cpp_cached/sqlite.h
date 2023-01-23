@@ -69,7 +69,7 @@ struct cache_row_value
 };
 
 template <class T>
-inline std::optional<T> SqliteCache::get(const std::string& skey)
+std::optional<T> SqliteCache::get(const std::string& skey)
 {
 	using namespace SQLite;
 	std::optional<T> res;
@@ -110,7 +110,7 @@ inline std::optional<T> SqliteCache::get(const std::string& skey)
 }
 
 template <class T>
-inline void SqliteCache::set(const std::string& key, const T& value, time_point d)
+void SqliteCache::set(const std::string& key, const T& value, time_point d)
 {
 	using namespace SQLite;
 	cache_row_value values{};
