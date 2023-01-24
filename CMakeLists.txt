@@ -7,6 +7,9 @@ project ("cpp_cached" VERSION 0.1.0
 
 message("Configuring cpp_cached ...")
 
+add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Od>")
+add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Ob0>")
+
 include(FetchContent)
 FetchContent_Declare(
   rr_cmake
