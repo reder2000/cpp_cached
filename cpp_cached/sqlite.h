@@ -84,7 +84,7 @@ std::optional<T> SqliteCache::get(const std::string& skey)
 {
   using namespace SQLite;
   std::optional<T> res;
-  std::string      where = "get_db\n";
+  std::string      where = "get_db";
   try
   {
     auto key = skey.c_str();
@@ -92,11 +92,15 @@ std::optional<T> SqliteCache::get(const std::string& skey)
     using duration = std__chrono::utc_clock::duration;
     time_point expire_time;
     {
-      auto      db    = get_db(false);
+      auto db         = get_db(false);
+      where           = "query0";
       Statement query = query_retry(db, "SELECT * FROM CACHE where key = ?");
+      where           = "bind0";
       query.bind(1, key);
+      where        = "executeStep_retry";
       auto success = executeStep_retry(db, query);
       if (! success) return res;
+      where       = "getColumns";
       auto values = query.getColumns<cache_row_value, 6>();
       expire_time = time_point(duration(values.expire_time));
     }
@@ -112,42 +116,50 @@ std::optional<T> SqliteCache::get(const std::string& skey)
     }
     {
       // get blob
+      where           = "blob get_db";
       auto db         = get_db(true);
-      where           = "query";
+      where           = "blob query";
       Statement query = query_retry(db, "SELECT * FROM CACHE where key = ?");
-      where           = "bind";
+      where           = "blob bind";
       query.bind(1, key);
-      where        = "executeStep";
+      where        = "blob executeStep";
       auto success = executeStep_retry(db, query);
       if (! success) return res;
-      where         = "getColumn";
+      where         = "blob getColumn";
       auto col_blob = query.getColumn(6);
-      where         = "getblob";
+      where         = "blob getblob";
       imemstream sin(reinterpret_cast<const char*>(col_blob.getBlob()), col_blob.size());
       cereal::BinaryInputArchive archive(sin);
       T                          tmp;
-      where = "archive";
+      where = "blob archive";
       archive(tmp);
       res = tmp;
     }
     {
       // update counters
-      auto      db = get_db(true);
+      where   = "get2";
+      auto db = get_db(true);
+      where   = "query2";
       Statement query2 =
           query_retry(db, "UPDATE cache SET access_count = access_count + 1 WHERE key=?");
+      where = "bind2";
       query2.bind(1, key);
+      where = "exec_retry2";
       exec_retry(db, query2);
       //query2.exec();
+      where            = "query2";
       Statement query3 = query_retry(db, "UPDATE cache SET access_time = ? WHERE key=?");
       duration  dnow   = now.time_since_epoch();
+      where            = "bind3";
       bind(query3, dnow.count(), key);
+      where = "exec_retry3";
       exec_retry(db, query3);
     }
   }
   catch (std::exception& e)
   {
-    fmt::print("failed reading blob : {} \n", where);
-    throw std::runtime_error(fmt::format("failed reading blob {} {}\n", where, e.what()));
+    //fmt::print("failed reading blob : {} \n", where);
+    throw std::runtime_error(fmt::format("failed reading blob at {} since {}\n", where, e.what()));
   }
   return res;
 }

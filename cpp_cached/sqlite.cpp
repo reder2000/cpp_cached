@@ -168,8 +168,8 @@ int try_exec_retry(SQLite::Database& db, const char* apQueries, int nb_retries)
   }
   //    if (SQLITE_OK != res && SQLITE_DONE != res && SQLITE_BUSY != res && SQLITE_LOCKED != res)
 
-  throw std::runtime_error(
-      fmt::format("exec, giving up : {}", SQLite::Exception(db.getHandle(), res).what()));
+  throw std::runtime_error(fmt::format("exec apQueries {}, giving up : {}", apQueries,
+                                       SQLite::Exception(db.getHandle(), res).what()));
 }
 
 int SqliteCache::exec_retry(SQLite::Database& db, const char* apQueries)
@@ -180,29 +180,38 @@ int SqliteCache::exec_retry(SQLite::Database& db, const char* apQueries)
 int try_exec_retry(SQLite::Database& db, SQLite::Statement& st, int nb_retries)
 {
   int res;
-
-  while (nb_retries--)
+  int nb_retries1 = nb_retries;
+  while (nb_retries1--)
   {
     res = st.tryExecuteStep();
     if (SQLITE_DONE == res)  // the statement has finished executing successfully
       return res;
+    std::this_thread::sleep_for(std::chrono::milliseconds(BUSYTIME));
   }
-
+  nb_retries1 = 2 * nb_retries;
+  while (nb_retries1--)
+  {
+    res = st.tryExecuteStep();
+    if (SQLITE_DONE == res)  // the statement has finished executing successfully
+      return res;
+    std::this_thread::sleep_for(std::chrono::milliseconds(BUSYTIME * 2));
+  }
   if (SQLITE_ROW == res)
   {
     throw std::runtime_error(
-        fmt::format("exec, giving up : {}",
+        fmt::format("Statement exec, giving up : {}",
                     SQLite::Exception("exec() does not expect results. Use executeStep.").what()));
   }
   else if (res == sqlite3_errcode(db.getHandle()))
   {
-    throw std::runtime_error(
-        fmt::format("exec, giving up : {}", SQLite::Exception(db.getHandle(), res).what()));
+    throw std::runtime_error(fmt::format("Statement exec, giving up : {}",
+                                         SQLite::Exception(db.getHandle(), res).what()));
   }
   else
   {
-    throw std::runtime_error(fmt::format(
-        "exec, giving up : {}", SQLite::Exception("Statement needs to be reseted", res).what()));
+    throw std::runtime_error(
+        fmt::format("Statement exec, giving up : {}",
+                    SQLite::Exception("Statement needs to be reseted", res).what()));
   }
 }
 
