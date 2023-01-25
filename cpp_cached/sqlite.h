@@ -38,6 +38,7 @@ class cpp_cached_API SqliteCache
   SQLite::Database get_db(bool can_write);
 
   bool has(const std::string& key);
+  bool is_expired(const std::string& key);
 
   void erase(const std::string& key);
 
@@ -45,7 +46,7 @@ class cpp_cached_API SqliteCache
   void set(const std::string& key, const T& value, time_point d = time_point());
 
   template <class T>
-  std::optional<T> get(const std::string& key);
+  T get(const std::string& key);
 
   // gets a value, compute it if necessary
   template <class F>
@@ -80,40 +81,47 @@ struct cache_row_value
 };
 
 template <class T>
-std::optional<T> SqliteCache::get(const std::string& skey)
+T SqliteCache::get(const std::string& skey)
 {
   using namespace SQLite;
-  std::optional<T> res;
-  std::string      where = "get_db";
+  using duration = std__chrono::utc_clock::duration;
+  T           res;
+  std::string where = "get_db";
   try
   {
     auto key = skey.c_str();
-    if (! has(skey)) return res;
-    using duration = std__chrono::utc_clock::duration;
-    time_point expire_time;
-    {
-      auto db         = get_db(false);
-      where           = "query0";
-      Statement query = query_retry(db, "SELECT * FROM CACHE where key = ?");
-      where           = "bind0";
-      query.bind(1, key);
-      where        = "executeStep_retry";
-      auto success = executeStep_retry(db, query);
-      if (! success) return res;
-      where       = "getColumns";
-      auto values = query.getColumns<cache_row_value, 6>();
-      expire_time = time_point(duration(values.expire_time));
-    }
-    std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
-    // remove row if expired
-    if (now > expire_time)
-    {
-      //Statement query2(db, "DELETE FROM cache WHERE key = ?");
-      //query2.bind(1, key);
-      //query2.exec();
-      erase(skey);
-      return res;
-    }
+    MREQUIRE(has(skey), "{} not found in DB", skey);
+    //if (! has(skey)) return res;
+    //if (is_expired(skey))
+    //{
+    //  erase(skey);
+    //  return res;
+    //}
+    //using duration = std__chrono::utc_clock::duration;
+    //time_point expire_time;
+    //{
+    //  auto db         = get_db(false);
+    //  where           = "query0";
+    //  Statement query = query_retry(db, "SELECT * FROM CACHE where key = ?");
+    //  where           = "bind0";
+    //  query.bind(1, key);
+    //  where        = "executeStep_retry";
+    //  auto success = executeStep_retry(db, query);
+    //  if (! success) return res;
+    //  where       = "getColumns";
+    //  auto values = query.getColumns<cache_row_value, 6>();
+    //  expire_time = time_point(duration(values.expire_time));
+    //}
+    //std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
+    //// remove row if expired
+    //if (now > expire_time)
+    //{
+    //  //Statement query2(db, "DELETE FROM cache WHERE key = ?");
+    //  //query2.bind(1, key);
+    //  //query2.exec();
+    //  erase(skey);
+    //  return res;
+    //}
     {
       // get blob
       where           = "blob get_db";
@@ -124,7 +132,8 @@ std::optional<T> SqliteCache::get(const std::string& skey)
       query.bind(1, key);
       where        = "blob executeStep";
       auto success = executeStep_retry(db, query);
-      if (! success) return res;
+      //if (! success) return res;
+      MREQUIRE(success, "getting blob failed for {}", skey);
       where         = "blob getColumn";
       auto col_blob = query.getColumn(6);
       where         = "blob getblob";
@@ -149,8 +158,9 @@ std::optional<T> SqliteCache::get(const std::string& skey)
       //query2.exec();
       where            = "query2";
       Statement query3 = query_retry(db, "UPDATE cache SET access_time = ? WHERE key=?");
-      duration  dnow   = now.time_since_epoch();
-      where            = "bind3";
+      std__chrono::utc_clock::time_point now  = std__chrono::utc_clock::now();
+      duration                           dnow = now.time_since_epoch();
+      where                                   = "bind3";
       bind(query3, dnow.count(), key);
       where = "exec_retry3";
       exec_retry(db, query3);

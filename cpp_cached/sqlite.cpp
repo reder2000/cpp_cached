@@ -101,6 +101,33 @@ bool SqliteCache::has(const std::string& key)
   }
 }
 
+bool SqliteCache::is_expired(const std::string& skey)
+{
+  // asuming has
+  using duration = std__chrono::utc_clock::duration;
+  time_point  expire_time;
+  std::string where = "get_db";
+  auto        db    = get_db(false);
+  where             = "query0";
+  Statement query   = query_retry(db, "SELECT expire_time FROM CACHE where key = ?");
+  where             = "bind0";
+  auto key          = skey.c_str();
+  query.bind(1, key);
+  where        = "executeStep_retry";
+  auto success = executeStep_retry(db, query);
+  //if (! success) return res;
+  MREQUIRE(success, "{} not in db", skey);
+  where                 = "getColumns";
+  int64_t i_expire_time = query.getColumn(1).getInt64();
+  //auto    values = query.getColumns<cache_row_value, 6>();
+  //  expire_time = time_point(duration(values.expire_time));
+  expire_time = time_point(duration(i_expire_time));
+
+  std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
+  // remove row if expired
+  return now > expire_time;
+}
+
 void SqliteCache::erase(const std::string& key)
 {
   if (! has(key)) return;
