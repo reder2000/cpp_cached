@@ -118,7 +118,7 @@ bool SqliteCache::is_expired(const std::string& skey)
   //if (! success) return res;
   MREQUIRE(success, "{} not in db", skey);
   where                 = "getColumns";
-  int64_t i_expire_time = query.getColumn(1).getInt64();
+  int64_t i_expire_time = query.getColumn(0).getInt64();
   //auto    values = query.getColumns<cache_row_value, 6>();
   //  expire_time = time_point(duration(values.expire_time));
   expire_time = time_point(duration(i_expire_time));
