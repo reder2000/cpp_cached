@@ -1,5 +1,6 @@
 #include "sqlite.h"
 #include "sqlite3.h"
+#include <thread>
 
 using namespace SQLite;
 
@@ -93,7 +94,7 @@ bool SqliteCache::has(const std::string& key)
     where           = "has:bind";
     query.bind(1, key);
     where = "has::executeStep_retry";
-    return executeStep_retry(db, query) != 0;
+    return executeStep_retry(db, query) ;
   }
   catch (const std::exception& e)
   {

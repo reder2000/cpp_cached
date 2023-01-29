@@ -12,8 +12,13 @@ TEST_CASE("sqlite", "[cache][hide]") {
 		std::string key = std::to_string(i);
 		cache.set(key.c_str(), toto);
 	}
-	cache.get< std::vector<int>>("1");
-	cache.erase("1");
-	auto fun = [](){return std::vector{1,2}; };
-	cache.get("1", fun);
+	int ikey=10;
+	auto skey = to_string(ikey);
+	auto res = cache.get< std::vector<int>>(skey);
+	CHECK(res.at(0)==ikey);
+	cache.erase(skey);
+	CHECK(!cache.has(skey));
+	auto fun = [ikey](){return std::vector<int>{ikey,ikey+1}; };
+	res = cache.get(skey, fun);
+	CHECK(res.at(0)==ikey);
 }
