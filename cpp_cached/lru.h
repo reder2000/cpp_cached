@@ -13,11 +13,11 @@
 #include <cpp_rutils/literals.h>
 #include "cache_imp_exp.h"
 
-class cpp_cached_API LRU_cache {
+class cpp_cached_API LRUCache {
 
 public:
 
-	LRU_cache(size_t maximum_memory = 1_GB );
+	LRUCache(size_t maximum_memory = 1_GB);
 
 	void resize(size_t maximum_memory);
 
@@ -30,6 +30,11 @@ public:
 
 	template <class T>
 	const T& get(const std::string& key);
+
+	// gets a value, compute it if necessary
+	template <class F>
+	std::invoke_result_t<F> get(const std::string& key, F callback);
+
 
 private:
 
@@ -48,30 +53,30 @@ private:
 	size_t _maximum_memory;
 	size_t _current_memory;
 
-	const entry& _get(const std::string& key) ;
+	const entry& _get(const std::string& key);
 
-	void reclaim(size_t memory)  ;
+	void reclaim(size_t memory);
 
 	map_type _map;
 	lru_type _list;
 };
 
-inline const  LRU_cache::entry & LRU_cache::_get(const std::string& key) 
+inline const  LRUCache::entry& LRUCache::_get(const std::string& key)
 {
-	MREQUIRE( has(key) , "{} does not exits", key);
+	MREQUIRE(has(key), "{} does not exits", key);
 	return const_cast<map_type*>(&_map)->operator[](key);
 }
 
 
 template<class T>
-inline LRU_cache::entry::entry(const T& value) :
+LRUCache::entry::entry(const T& value) :
 	_value(value)
 {
 	_mem_used = sizeof(std::any) + memory_size(value);
 }
 
 template<class T>
-inline void LRU_cache::set(const std::string& key, const T& value)
+void LRUCache::set(const std::string& key, const T& value)
 {
 	MREQUIRE(!has(key), " {} already exists ", key);
 	entry new_entry(value);
@@ -82,7 +87,18 @@ inline void LRU_cache::set(const std::string& key, const T& value)
 }
 
 template<class T>
-inline const T& LRU_cache::get(const std::string& key)
+const T& LRUCache::get(const std::string& key)
 {
 	return std::any_cast<const T&>(_get(key)._value);
+}
+
+template <class F>
+std::invoke_result_t<F> LRUCache::get(const std::string& key, F callback)
+{
+	using T = std::invoke_result_t<F>;
+	if (this->has(key)) return get<T>(key);
+	T res = callback();
+	set(key, res);
+	return get<T>(key);
+
 }

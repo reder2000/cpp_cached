@@ -32,37 +32,36 @@ public:
 	SqliteCache(const std::filesystem::path& root_path = default_root_path(),
 		uint64_t                     max_size = default_max_size);
 
-	void create_db();
-
-	SQLite::Database get_db(bool can_write);
 
 	bool has(const std::string& key);
-	bool is_expired(const std::string& key);
-
 	void erase(const std::string& key);
-
-	template <class T>
-	void set(const std::string& key, const T& value, time_point d = time_point());
-
 	template <class T>
 	T get(const std::string& key);
-
+	template <class T>
+	void set(const std::string& key, const T& value, time_point d = time_point());
 	// gets a value, compute it if necessary
 	template <class F>
 	std::invoke_result_t<F> get(const std::string& key, F callback, time_point d = time_point());
-
-private:
-	std::filesystem::path _root_path, _db_name;
-	uint64_t              _max_size;
 
 	size_t total_size(SQLite::Database& db) const;
 	void   clean_expired(SQLite::Database& db);
 	void   clean_older(SQLite::Database& db, int64_t need_to_free);
 
+private:
+	std::filesystem::path _root_path, _db_name;
+	uint64_t              _max_size;
+
+
 	static int               exec_retry(SQLite::Database& db, const char* apQueries);
 	static int               exec_retry(SQLite::Database& db, SQLite::Statement& st);
 	static bool              executeStep_retry(SQLite::Database& db, SQLite::Statement& st);
 	static SQLite::Statement query_retry(const SQLite::Database& aDatabase, const char* apQuery);
+
+	void create_db();
+	SQLite::Database get_db(bool can_write);
+	bool is_expired(const std::string& key);
+
+
 };
 
 // today 23:59:59
@@ -90,37 +89,6 @@ T SqliteCache::get(const std::string& skey)
 	{
 		auto key = skey.c_str();
 		MREQUIRE(has(skey), "{} not found in DB", skey);
-		//if (! has(skey)) return res;
-		//if (is_expired(skey))
-		//{
-		//  erase(skey);
-		//  return res;
-		//}
-		//using duration = std__chrono::utc_clock::duration;
-		//time_point expire_time;
-		//{
-		//  auto db         = get_db(false);
-		//  where           = "query0";
-		//  Statement query = query_retry(db, "SELECT * FROM CACHE where key = ?");
-		//  where           = "bind0";
-		//  query.bind(1, key);
-		//  where        = "executeStep_retry";
-		//  auto success = executeStep_retry(db, query);
-		//  if (! success) return res;
-		//  where       = "getColumns";
-		//  auto values = query.getColumns<cache_row_value, 6>();
-		//  expire_time = time_point(duration(values.expire_time));
-		//}
-		//std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
-		//// remove row if expired
-		//if (now > expire_time)
-		//{
-		//  //Statement query2(db, "DELETE FROM cache WHERE key = ?");
-		//  //query2.bind(1, key);
-		//  //query2.exec();
-		//  erase(skey);
-		//  return res;
-		//}
 		{
 			// get blob
 			where = "blob get_db";

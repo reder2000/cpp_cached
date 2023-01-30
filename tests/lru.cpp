@@ -4,7 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("lru", "[cache][hide]") {
-	LRU_cache c(1024);
+	LRUCache c(1024);
 	using vi = std::vector<int>;
 	vi v(75);
 	c.set("1", v);
