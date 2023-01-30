@@ -21,5 +21,6 @@ TEST_CASE("twolevel", "[cache][hide]")
 	two.get("3", []() {return 3.; });
 	CHECK(mem->has("3"));
 	CHECK(mem->has("3"));
+	CHECK(two.get<double>("2") == 2.);
 	erase();
 }

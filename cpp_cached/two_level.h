@@ -60,7 +60,7 @@ T TwoLevelCache<Level1Cache, Level2Cache>::get(const std::string& key)
 		return _level1_cache->get<T>(key);
 	MREQUIRE(_level2_cache->has(key), "key {} not found", key);
 	T res = _level2_cache->get<T>(key);
-	_level1_cache->set(res);
+	_level1_cache->set(key, res);
 	return res;
 }
 
