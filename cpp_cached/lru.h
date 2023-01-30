@@ -35,6 +35,7 @@ public:
 	template <class F>
 	std::invoke_result_t<F> get(const std::string& key, F callback);
 
+	static std::shared_ptr<LRUCache> get_default();
 
 private:
 

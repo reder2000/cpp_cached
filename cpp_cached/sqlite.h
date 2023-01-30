@@ -47,6 +47,8 @@ public:
 	void   clean_expired(SQLite::Database& db);
 	void   clean_older(SQLite::Database& db, int64_t need_to_free);
 
+	static std::shared_ptr<SqliteCache> get_default();
+
 private:
 	std::filesystem::path _root_path, _db_name;
 	uint64_t              _max_size;

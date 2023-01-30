@@ -13,7 +13,8 @@ concept is_a_cache = requires(T a) { a.has(std::string{}); }
 && requires(T a) { a.get<int>(std::string{}); }
 && requires(T a) { a.erase(std::string{}); }
 && requires(T a) { a.set(std::string{}, int{}); }
-&& requires(T a) { a.get(std::string{}, []()->int {return 0; }); };
+&& requires(T a) { a.get(std::string{}, []()->int {return 0; }); }
+&& requires(T) { T::get_default(); };
 
 template <is_a_cache Level1Cache, is_a_cache Level2Cache>
 class cpp_cached_API TwoLevelCache
@@ -33,7 +34,7 @@ public:
 	template <class F>
 	std::invoke_result_t<F> get(const std::string& key, F callback);
 
-private:
+	static std::shared_ptr<TwoLevelCache> get_default();
 
 	std::shared_ptr<Level1Cache> _level1_cache;
 	std::shared_ptr<Level2Cache> _level2_cache;
@@ -95,6 +96,13 @@ std::invoke_result_t<F> TwoLevelCache<Level1Cache, Level2Cache>::get(const std::
 	T res = callback();
 	_level1_cache->set(key, res);
 	_level2_cache->set(key, res);
+	return res;
+}
+
+template <is_a_cache Level1Cache, is_a_cache Level2Cache>
+std::shared_ptr<TwoLevelCache<Level1Cache, Level2Cache>> TwoLevelCache<Level1Cache, Level2Cache>::get_default()
+{
+	static auto res = std::make_shared<TwoLevelCache>(Level1Cache::get_default(), Level2Cache::get_default());
 	return res;
 }
 

@@ -6,9 +6,10 @@
 
 TEST_CASE("twolevel", "[cache][hide]")
 {
-	auto sql = std::make_shared<SqliteCache>();
-	auto mem = std::make_shared<LRUCache>();
-	MemAndSQLiteCache two(mem, sql);
+	auto& two = *MemAndSQLiteCache::get_default();
+	auto mem = two._level1_cache;
+	auto sql = two._level2_cache;
+
 	auto erase = [&two]() {
 		two.erase("1");
 		two.erase("2");

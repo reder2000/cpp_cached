@@ -184,6 +184,12 @@ void SqliteCache::clean_older(Database& db, int64_t need_to_free)
 	}
 }
 
+std::shared_ptr<SqliteCache> SqliteCache::get_default()
+{
+	static auto res = std::make_shared<SqliteCache>();
+	return res;
+}
+
 #define SQLITE_OK 0 /* Successful result */
 //extern "C" int sqlite3_changes(sqlite3*);
 

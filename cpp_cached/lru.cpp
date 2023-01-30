@@ -18,6 +18,12 @@ void LRUCache::erase(const std::string& key) {
 	_map.erase(key);
 }
 
+std::shared_ptr<LRUCache> LRUCache::get_default()
+{
+	static auto res = std::make_shared<LRUCache>();
+	return res;
+}
+
 
 void LRUCache::reclaim(size_t memory) {
 	while ((memory + _current_memory) > _maximum_memory && !_list.empty()) {
