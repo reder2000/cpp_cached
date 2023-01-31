@@ -62,7 +62,7 @@ private:
 	void create_db();
 	SQLite::Database get_db(bool can_write);
 	bool is_expired(const std::string& key);
-
+	void really_erase(const std::string& key);
 
 };
 

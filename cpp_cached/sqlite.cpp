@@ -98,7 +98,7 @@ bool SqliteCache::has(const std::string& key)
 			return false;
 		if (is_expired(key))
 		{
-			erase(key);
+			really_erase(key);
 			return false;
 		}
 		return true;
@@ -140,6 +140,11 @@ bool SqliteCache::is_expired(const std::string& skey)
 void SqliteCache::erase(const std::string& key)
 {
 	if (!has(key)) return;
+	really_erase(key);
+}
+
+void SqliteCache::really_erase(const std::string& key)
+{
 	auto      db = get_db(true);
 	Statement query(db, "DELETE FROM cache where key=?");
 	query.bind(1, key);
