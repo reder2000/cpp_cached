@@ -16,4 +16,3 @@ add_definitions(-DUSING_PCH)
 
 enable_testing()
 add_test(NAME cached_main COMMAND cached_tests)
-
