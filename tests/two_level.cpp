@@ -17,11 +17,15 @@ TEST_CASE("twolevel", "[cache][hide]")
 	erase();
 	sql->set("1", 1);
 	CHECK(two.has("1"));
+	auto const& i = two.get<int>("1");
+	const_cast<int&>(i) = 2;
+	CHECK(two.get<int>("1") == 2);
 	two.set("2", 2.);
 	CHECK(sql->has("2"));
-	two.get("3", []() {return 3.; });
+	auto const& j = two.get("3", []() {return 3.; });
 	CHECK(mem->has("3"));
-	CHECK(mem->has("3"));
+	const_cast<double&>(j) = 4.;
+	CHECK(two.get<double>("3") == 4);
 	CHECK(two.get<double>("2") == 2.);
 	erase();
 }

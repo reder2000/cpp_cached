@@ -14,4 +14,12 @@ TEST_CASE("lru", "[cache][hide]") {
 	c.get<vi>("2");
 	auto vo = std::make_shared<int>(12);
 	c.set("4", vo);
+	c.set("5", 5);
+	auto const& i = c.get<int>("5");
+	const_cast<int&>(i) = 6;
+	CHECK(c.get<int>("5") == 6);
+	auto const& j = c.get("6", []() {return 6; });
+	const_cast<int&>(j) = 7;
+	CHECK(c.get<int>("6") == 7);
+
 }

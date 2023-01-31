@@ -33,7 +33,7 @@ public:
 
 	// gets a value, compute it if necessary
 	template <class F>
-	std::invoke_result_t<F> get(const std::string& key, F callback);
+	const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
 
 	static std::shared_ptr<LRUCache> get_default();
 
@@ -94,12 +94,10 @@ const T& LRUCache::get(const std::string& key)
 }
 
 template <class F>
-std::invoke_result_t<F> LRUCache::get(const std::string& key, F callback)
+const std::decay_t<std::invoke_result_t<F>>& LRUCache::get(const std::string& key, F callback)
 {
 	using T = std::invoke_result_t<F>;
 	if (this->has(key)) return get<T>(key);
-	T res = callback();
-	set(key, res);
+	set(key, callback());
 	return get<T>(key);
-
 }
