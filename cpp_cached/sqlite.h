@@ -62,7 +62,7 @@ private:
 	void create_db();
 	SQLite::Database get_db(bool can_write);
 	bool is_expired(const std::string& key);
-	void really_erase(const std::string& key);
+	void really_erase(SQLite::Database& db, const std::string& key);
 
 };
 
@@ -185,10 +185,8 @@ std::invoke_result_t<F> SqliteCache::get(const std::string& key, F callback, tim
 {
 	using T = std::invoke_result_t<F>;
 	bool has_key = has(key);
-	if (has_key && !is_expired(key))
+	if (has_key)
 		return get<T>(key);
-	if (has_key) // must be expired
-		erase(key);
 	T res = callback();
 	set(key, res, d);
 	return res;

@@ -88,17 +88,20 @@ bool SqliteCache::has(const std::string& key)
 	std::string where = "has:get";
 	try
 	{
-		auto db = get_db(false);
-		where = "has:query";
-		Statement query = query_retry(db, "SELECT key FROM cache WHERE key = ?");
-		where = "has:bind";
-		query.bind(1, key);
-		where = "has::executeStep_retry";
-		if (!executeStep_retry(db, query))
-			return false;
+		{
+			auto db = get_db(false);
+			where = "has:query";
+			Statement query = query_retry(db, "SELECT key FROM cache WHERE key = ?");
+			where = "has:bind";
+			query.bind(1, key);
+			where = "has::executeStep_retry";
+			if (!executeStep_retry(db, query))
+				return false;
+		}
 		if (is_expired(key))
 		{
-			really_erase(key);
+			auto db = get_db(true);
+			really_erase(db, key);
 			return false;
 		}
 		return true;
@@ -140,12 +143,12 @@ bool SqliteCache::is_expired(const std::string& skey)
 void SqliteCache::erase(const std::string& key)
 {
 	if (!has(key)) return;
-	really_erase(key);
+	auto db = get_db(true);
+	really_erase(db, key);
 }
 
-void SqliteCache::really_erase(const std::string& key)
+void SqliteCache::really_erase(SQLite::Database& db, const std::string& key)
 {
-	auto      db = get_db(true);
 	Statement query(db, "DELETE FROM cache where key=?");
 	query.bind(1, key);
 	query.exec();

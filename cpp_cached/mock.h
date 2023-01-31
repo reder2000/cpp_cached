@@ -34,7 +34,7 @@ public:
 
 
 template<class T>
-void MockCache::set(const std::string& key, const T& value)
+void MockCache::set(const std::string& key, const T& /*value*/)
 {
 	fmt::print("MockCache::set key {} value of type {}\n", key, type_name_short<T>());
 }
