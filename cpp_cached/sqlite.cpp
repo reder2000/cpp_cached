@@ -24,8 +24,8 @@ std::string machine_name()
 #endif
 }
 
-SqliteCache::SqliteCache(const std::filesystem::path& root_path, uint64_t max_size)
-	: _root_path(root_path), _max_size(max_size)
+SqliteCache::SqliteCache( std::filesystem::path root_path, uint64_t max_size)
+	: _root_path(std::move(root_path)), _max_size(max_size)
 {
 	auto rerroot = _root_path / machine_name();
 	_db_name = rerroot / "cache.db";
@@ -118,7 +118,7 @@ bool SqliteCache::is_expired(const std::string& skey)
 	// asuming has
 	using duration = std__chrono::utc_clock::duration;
 	time_point  expire_time;
-	std::string where = "get_db";
+    std::string where = "get_db";
 	auto        db = get_db(false);
 	where = "query0";
 	Statement query = query_retry(db, "SELECT expire_time FROM CACHE where key = ?");
@@ -309,11 +309,11 @@ bool SqliteCache::executeStep_retry(SQLite::Database& db, SQLite::Statement& st)
 SQLite::Statement SqliteCache::query_retry(const SQLite::Database& aDatabase, const char* apQuery)
 {
 	int nb_retries = NB_RETRIES;
-	while (nb_retries)
+	while (nb_retries>0)
 	{
 		try
 		{
-			return Statement(aDatabase, apQuery);
+			return Statement{aDatabase, apQuery};
 		}
 		catch (const std::exception& e)
 		{
@@ -322,7 +322,7 @@ SQLite::Statement SqliteCache::query_retry(const SQLite::Database& aDatabase, co
 			if (!nb_retries) throw std::runtime_error(fmt::format("query giving up : {}", e.what()));
 		}
 	}
-	throw;
+    throw;
 }
 
 SqliteCache::time_point last_point_of_today()

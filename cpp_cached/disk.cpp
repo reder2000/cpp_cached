@@ -58,7 +58,7 @@ std::string to_conformant(const std::string& key) {
 }
 
 std::string split_long_filename(const std::string& key) {
-	size_t first = 0;
+	size_t first;
 	size_t last = std::min<size_t>(key.size(), 240);
 	std::string res(key.begin(), key.begin() + last);
 	for (; last < key.size();) {
@@ -80,8 +80,8 @@ path get_full_path(const path& root_path, const std::string& key) {
 }
 
 
-DiskCache::DiskCache(const path& root_path) :
-	_root_path(root_path)
+DiskCache::DiskCache(path root_path) :
+	_root_path(std::move(root_path))
 {
 	time_t tt;
 	time(&tt);

@@ -47,7 +47,7 @@ T MockCache::get(const std::string& key)
 }
 
 template <class F>
-std::invoke_result_t<F> MockCache::get(const std::string& key, F callback)
+std::invoke_result_t<F> MockCache::get(const std::string& key, F /*callback*/)
 {
 	using T = std::invoke_result_t<F>;
 	return get<T>(key);

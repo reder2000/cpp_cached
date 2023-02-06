@@ -29,7 +29,7 @@ public:
 	}
 	static constexpr size_t default_max_size = 2_GB;
 
-	SqliteCache(const std::filesystem::path& root_path = default_root_path(),
+	SqliteCache(std::filesystem::path root_path = default_root_path(),
 		uint64_t                     max_size = default_max_size);
 
 

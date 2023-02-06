@@ -10,7 +10,7 @@ TEST_CASE("sqlite", "[cache][hide]") {
 	for (int i = 0; i < 20; i++) {
 		std::vector<int> toto = { i,i + 1 };
 		std::string key = std::to_string(i);
-		cache.set(key.c_str(), toto);
+		cache.set(key, toto);
 	}
 	int ikey=10;
 	auto skey = to_string(ikey);

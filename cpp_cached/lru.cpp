@@ -32,7 +32,7 @@ void LRUCache::reclaim(size_t memory) {
 		_current_memory -= i->second._mem_used;
 		_map.erase(i);
 		_list.pop_back();
-	};
+	}
 }
 
 
