@@ -10,17 +10,19 @@ constexpr int BUSYTIME = 2000;
 std::string machine_name()
 {
 #if _MSC_VER
-#if _DEBUG
-	return "MSC_DEBUG_";
+	#if __clang__
+		#define MACHIN_PREFIX "CLANGCL"
+	#else
+		#define MACHIN_PREFIX "MSC"
+	#endif
 #else
-	return "MSC_RELEASE_";
+	#define MACHIN_PREFIX "XXX"
 #endif
-#else
+
 #if _DEBUG
-	return "XXX_DEBUG_";
+	return MACHIN_PREFIX "MSC_DEBUG_";
 #else
-	return "XXX_RELEASE_";
-#endif
+	return MACHIN_PREFIX "MSC_RELEASE_";
 #endif
 }
 
