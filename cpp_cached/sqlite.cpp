@@ -20,9 +20,9 @@ std::string machine_name()
 #endif
 
 #if _DEBUG
-	return MACHIN_PREFIX "MSC_DEBUG_";
+	return MACHIN_PREFIX "_DEBUG";
 #else
-	return MACHIN_PREFIX "MSC_RELEASE_";
+	return MACHIN_PREFIX "_RELEASE";
 #endif
 }
 
