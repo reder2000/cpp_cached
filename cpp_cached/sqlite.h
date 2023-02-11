@@ -18,6 +18,8 @@
 // - path: path to the cache directory
 // - data max age : either in seconds or days (triggers at midnight in a given timezone)
 
+std::string machine_name();
+
 class cpp_cached_API SqliteCache
 {
 
