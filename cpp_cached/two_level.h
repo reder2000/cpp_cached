@@ -114,3 +114,4 @@ std::shared_ptr<TwoLevelCache<Level1Cache, Level2Cache>> TwoLevelCache<Level1Cac
 
 
 using MemAndSQLiteCache = TwoLevelCache<LRUCache, SqliteCache>;
+using MemAndSQLiteSingleCache = TwoLevelCache<LRUCache, SqliteSingleCache>;

@@ -2,29 +2,13 @@
 #include "sqlite3.h"
 #include <thread>
 
+#include "sqlite.h"
+
 using namespace SQLite;
 
 constexpr int NB_RETRIES = 50;
 constexpr int BUSYTIME = 2000;
 
-std::string machine_name()
-{
-#if _MSC_VER
-	#if __clang__
-		#define MACHIN_PREFIX "CLANGCL"
-	#else
-		#define MACHIN_PREFIX "MSC"
-	#endif
-#else
-	#define MACHIN_PREFIX "XXX"
-#endif
-
-#if _DEBUG
-	return MACHIN_PREFIX "_DEBUG";
-#else
-	return MACHIN_PREFIX "_RELEASE";
-#endif
-}
 
 SqliteCache::SqliteCache( std::filesystem::path root_path, uint64_t max_size)
 	: _root_path(std::move(root_path)), _max_size(max_size)
@@ -203,69 +187,11 @@ std::shared_ptr<SqliteCache> SqliteCache::get_default()
 #define SQLITE_OK 0 /* Successful result */
 //extern "C" int sqlite3_changes(sqlite3*);
 
-int try_exec_retry(SQLite::Database& db, const char* apQueries, int nb_retries)
-{
-	int res;
-	while (nb_retries--)
-	{
-		res = db.tryExec(apQueries);
-		if (res == SQLITE_OK)
-		{
-			return sqlite3_changes(db.getHandle());
-		}
-		else
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(BUSYTIME));
-		}
-	}
-	//    if (SQLITE_OK != res && SQLITE_DONE != res && SQLITE_BUSY != res && SQLITE_LOCKED != res)
-
-	throw std::runtime_error(fmt::format("exec apQueries {}, giving up : {}", apQueries,
-		SQLite::Exception(db.getHandle(), res).what()));
-}
-
 int SqliteCache::exec_retry(SQLite::Database& db, const char* apQueries)
 {
 	return try_exec_retry(db, apQueries, NB_RETRIES);
 }
 
-int try_exec_retry(SQLite::Database& db, SQLite::Statement& st, int nb_retries)
-{
-	int res;
-	int nb_retries1 = nb_retries;
-	while (nb_retries1--)
-	{
-		res = st.tryExecuteStep();
-		if (SQLITE_DONE == res)  // the statement has finished executing successfully
-			return res;
-		std::this_thread::sleep_for(std::chrono::milliseconds(BUSYTIME));
-	}
-	nb_retries1 = 2 * nb_retries;
-	while (nb_retries1--)
-	{
-		res = st.tryExecuteStep();
-		if (SQLITE_DONE == res)  // the statement has finished executing successfully
-			return res;
-		std::this_thread::sleep_for(std::chrono::milliseconds(BUSYTIME * 2));
-	}
-	if (SQLITE_ROW == res)
-	{
-		throw std::runtime_error(
-			fmt::format("Statement exec, giving up : {}",
-				SQLite::Exception("exec() does not expect results. Use executeStep.").what()));
-	}
-	else if (res == sqlite3_errcode(db.getHandle()))
-	{
-		throw std::runtime_error(fmt::format("Statement exec, giving up : {}",
-			SQLite::Exception(db.getHandle(), res).what()));
-	}
-	else
-	{
-		throw std::runtime_error(
-			fmt::format("Statement exec, giving up : {}",
-				SQLite::Exception("Statement needs to be reseted", res).what()));
-	}
-}
 
 int SqliteCache::exec_retry(SQLite::Database& db, SQLite::Statement& st)
 {
@@ -273,34 +199,6 @@ int SqliteCache::exec_retry(SQLite::Database& db, SQLite::Statement& st)
 
 	// Return the number of rows modified by those SQL statements (INSERT, UPDATE or DELETE)
 	return sqlite3_changes(db.getHandle());
-}
-
-bool try_executeStep_retry(SQLite::Database& db, SQLite::Statement& st, int nb_retries)
-{
-	int res;
-	while (nb_retries--)
-	{
-		res = st.tryExecuteStep();
-		if ((SQLITE_ROW != res) && (SQLITE_DONE != res))
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(BUSYTIME));
-		}
-		else
-		{
-			return st.hasRow();
-		}
-	}
-	if (res == sqlite3_errcode(db.getHandle()))
-	{
-		throw std::runtime_error(
-			fmt::format("executeStep, giving up : {}", SQLite::Exception(db.getHandle(), res).what()));
-	}
-	else
-	{
-		throw std::runtime_error(
-			fmt::format("executeStep, giving up : {}",
-				SQLite::Exception("Statement needs to be reseted", res).what()));
-	}
 }
 
 bool SqliteCache::executeStep_retry(SQLite::Database& db, SQLite::Statement& st)
@@ -327,17 +225,3 @@ SQLite::Statement SqliteCache::query_retry(const SQLite::Database& aDatabase, co
     throw;
 }
 
-SqliteCache::time_point last_point_of_today()
-{
-	auto now = std__chrono::utc_clock::now();
-	auto nowsys = std__chrono::utc_clock::to_sys(now);
-	auto nowsystmt = std::chrono::system_clock::to_time_t(nowsys);
-	auto nowsysstructtm = to_<struct tm>::_(nowsystmt);
-	nowsysstructtm.tm_hour = 23;
-	nowsysstructtm.tm_min = 59;
-	nowsysstructtm.tm_sec = 59;
-	nowsystmt = to_<time_t>::_(nowsysstructtm);
-	nowsys = std::chrono::system_clock::from_time_t(nowsystmt);
-	auto now_midnight = std__chrono::utc_clock::from_sys(nowsys);
-	return now_midnight;
-}
