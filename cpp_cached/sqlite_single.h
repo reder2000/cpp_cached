@@ -68,7 +68,7 @@ private:
 	SQLite::Statement query_retry(const char* apQuery);
 
 	void create_db();
-	void get_db();
+	//void get_db();
 	bool is_expired(const std::string& key);
 	void really_erase(const std::string& key);
 
@@ -156,9 +156,6 @@ T SqliteSingleCache::get(const std::string& skey)
 template <class T>
 void SqliteSingleCache::set(const std::string& key, const T& value, std__chrono::utc_clock::time_point d)
 {
-	std__chrono::utc_clock::time_point t1 , t2;
-	if (t1==t2) ;
-
 	using namespace SQLite;
 	cache_row_value values{};
 	values.store_time = std__chrono::utc_clock::now().time_since_epoch().count();

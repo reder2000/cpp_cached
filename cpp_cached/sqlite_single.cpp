@@ -34,14 +34,16 @@ SqliteSingleCache::SqliteSingleCache( std::filesystem::path root_path, uint64_t 
 	_db_name = rerroot / "cache.db";
 	if (!std::filesystem::exists(rerroot)) MREQUIRE(std::filesystem::create_directories(rerroot));
 	create_db();
-	get_db();
+	//get_db();
 }
 
 void SqliteSingleCache::create_db()
 {
 	try
 	{
-		Database db(_db_name.string(), OPEN_READWRITE | OPEN_CREATE);
+		//Database db(_db_name.string(), OPEN_READWRITE | OPEN_CREATE);
+	         _db= std::make_unique<Database>(_db_name.string(), OPEN_READWRITE | OPEN_CREATE);
+		  Database &db = *_db;
 		//db.setBusyTimeout(1000);
 		try_exec_retry(db,"CREATE TABLE IF NOT EXISTS Cache ("
 			" key TEXT PRIMARY KEY,"
@@ -58,6 +60,9 @@ void SqliteSingleCache::create_db()
 			" Cache (access_time)",1);
 		try_exec_retry(db,"CREATE INDEX IF NOT EXISTS Cache_access_count ON"
 			" Cache (access_count)",1);
+                //try_exec_retry(db, "PRAGMA mmap_size=2147483648;", 1);
+		try_exec_retry(db,   "PRAGMA SYNCHRONOUS=0;",1);
+		// try_exec_retry(db,   "PRAGMA PAGE_SIZE=8192",1);;
 	}
 	catch (std::exception& e)
 	{
@@ -65,17 +70,17 @@ void SqliteSingleCache::create_db()
 	}
 }
 
-void SqliteSingleCache::get_db()
-{
-	try
-	{
-			_db= std::make_unique<Database>(_db_name.string(), OPEN_READWRITE);
-	}
-	catch (std::exception& e)
-	{
-		throw std::runtime_error(fmt::format("get_db failed {}\n", e.what()));
-	}
-}
+//void SqliteSingleCache::get_db()
+//{
+//	try
+//	{
+//			_db= std::make_unique<Database>(_db_name.string(), OPEN_READWRITE);
+//	}
+//	catch (std::exception& e)
+//	{
+//		throw std::runtime_error(fmt::format("get_db failed {}\n", e.what()));
+//	}
+//}
 
 bool SqliteSingleCache::has(const std::string& key)
 {
