@@ -6,7 +6,7 @@
 
 TEST_CASE("twolevel", "[cache][hide]")
 {
-	auto& two = *MemAndSQLiteCache::get_default();
+	auto& two = *MemAndDbCache::get_default();
 	auto mem = two._level1_cache;
 	auto sql = two._level2_cache;
 

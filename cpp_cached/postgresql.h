@@ -7,6 +7,7 @@
 #include <cpp_rutils/literals.h>
 #include <cpp_rutils/memstream.h>
 
+#include "cache_entry.h"
 #include "time_point.h"
 
 class PostgresCache
@@ -32,10 +33,10 @@ public:
 	void   clean_expired();
 	void   clean_older(int64_t need_to_free);
 
-	// static std::shared_ptr<SqliteCache> get_default();
+	static std::shared_ptr<PostgresCache> get_default();
 
-//private:
-	//std::filesystem::path _root_path, _db_name;
+	//private:
+		//std::filesystem::path _root_path, _db_name;
 	uint64_t              _max_size = 256_GB;
 
 
@@ -120,17 +121,6 @@ T PostgresCache::get(const std::string& skey)
 	return res;
 }
 
-
-// struct for extracting all fields
-struct cache_row_value
-{
-	std::string key;
-	int64_t     store_time;
-	int64_t     expire_time;
-	int64_t     access_time;
-	int64_t     accesss_count;
-	int64_t     size;
-};
 
 template <class T>
 void PostgresCache::set(const std::string& key, const T& value, cpp_cached::time_point d)

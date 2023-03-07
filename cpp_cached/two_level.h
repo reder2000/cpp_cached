@@ -5,7 +5,7 @@
 #include <cpp_rutils/assign_m.h>
 
 #include "cache_imp_exp.h"
-#include "sqlite.h"
+#include "postgresql.h"
 #include "lru.h"
 
 template <typename T>
@@ -112,6 +112,9 @@ std::shared_ptr<TwoLevelCache<Level1Cache, Level2Cache>> TwoLevelCache<Level1Cac
 	return res;
 }
 
+inline void fun()
+{
+	static_assert(is_a_cache<PostgresCache>);
+}
 
-using MemAndSQLiteCache = TwoLevelCache<LRUCache, SqliteCache>;
-using MemAndSQLiteSingleCache = TwoLevelCache<LRUCache, SqliteSingleCache>;
+using MemAndDbCache = TwoLevelCache<LRUCache, PostgresCache>;

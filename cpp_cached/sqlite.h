@@ -13,8 +13,12 @@
 #include <cpp_rutils/date.h>
 #include <cereal/archives/binary.hpp>
 
-#include "sqlite_single.h"
+#include "cache_entry.h"
 #include "time_point.h"
+
+int try_exec_retry(SQLite::Database& db, const char* apQueries, int nb_retries);
+int try_exec_retry(SQLite::Database& db, SQLite::Statement& st, int nb_retries);
+bool try_executeStep_retry(SQLite::Database& db, SQLite::Statement& st, int nb_retries);
 
 // sqlite cache parameters:
 // - size: size of the cache in bytes

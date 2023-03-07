@@ -193,11 +193,11 @@ PostgresCache::PostgresCache() : _connection(std::vector<std::pair<std::string, 
 		//  }
 	}
 	//
-	//std::shared_ptr<PostgresCache> PostgresCache::get_default()
-	//{
-	//  static auto res = std::make_shared<PostgresCache>();
-	//  return res;
-	//}
+	std::shared_ptr<PostgresCache> PostgresCache::get_default()
+	{
+		static auto res = std::make_shared<PostgresCache>();
+		return res;
+	}
 	//
 	//#define SQLITE_OK 0 /* Successful result */
 	////extern "C" int sqlite3_changes(sqlite3*);
