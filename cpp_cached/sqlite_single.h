@@ -13,6 +13,8 @@
 #include <cpp_rutils/memstream.h>
 #include <cereal/archives/binary.hpp>
 
+#include "time_point.h"
+
 // sqlite cache parameters:
 // - size: size of the cache in bytes
 // - path: path to the cache directory
@@ -25,7 +27,8 @@ class cpp_cached_API SqliteSingleCache
 {
 
 public:
-	using time_point = std__chrono::utc_clock::time_point;
+	//using time_point = std__chrono::utc_clock::time_point;
+	using time_point = cpp_cached::time_point;
 
 	static std::filesystem::path default_root_path()
 	{
@@ -54,7 +57,7 @@ public:
 	static std::shared_ptr<SqliteSingleCache> get_default();
 
 	// today 23:59:59
-	static time_point last_point_of_today();
+	//static time_point last_point_of_today();
 
 
 private:
@@ -129,20 +132,20 @@ T SqliteSingleCache::get(const std::string& skey)
 			where = "get2";
 			where = "query2";
 			Statement query2 =
-				query_retry( "UPDATE cache SET access_count = access_count + 1 WHERE key=?");
+				query_retry("UPDATE cache SET access_count = access_count + 1 WHERE key=?");
 			where = "bind2";
 			query2.bind(1, key);
 			where = "exec_retry2";
-			exec_retry( query2);
+			exec_retry(query2);
 			//query2.exec();
 			where = "query2";
-			Statement query3 = query_retry( "UPDATE cache SET access_time = ? WHERE key=?");
+			Statement query3 = query_retry("UPDATE cache SET access_time = ? WHERE key=?");
 			std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
 			duration                           dnow = now.time_since_epoch();
 			where = "bind3";
 			bind(query3, dnow.count(), key);
 			where = "exec_retry3";
-			exec_retry( query3);
+			exec_retry(query3);
 		}
 	}
 	catch (std::exception& e)
@@ -161,7 +164,7 @@ void SqliteSingleCache::set(const std::string& key, const T& value, std__chrono:
 	values.store_time = std__chrono::utc_clock::now().time_since_epoch().count();
 	if (d == std__chrono::utc_clock::time_point{})  // standard expiration is today at midnight
 	{
-		d = last_point_of_today();
+		d = cpp_cached::last_point_of_today();
 	}
 	values.expire_time = d.time_since_epoch().count();
 	values.access_time = values.store_time;
@@ -180,7 +183,7 @@ void SqliteSingleCache::set(const std::string& key, const T& value, std__chrono:
 	if ((ts + sz) > _max_size)
 	{  // reclaim old
 		int64_t need_to_free = (ts + sz) - _max_size;
-		clean_older( need_to_free);
+		clean_older(need_to_free);
 	}
 	int i_sz = static_cast<int>(sz);
 	bind(query, key.c_str(), values.store_time, values.expire_time, values.access_time,

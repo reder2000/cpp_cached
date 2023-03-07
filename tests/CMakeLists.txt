@@ -5,11 +5,13 @@ find_vcpkg_install_missing(Catch2)
 
 file (GLOB srcs CONFIGURE_DEPENDS *.cpp *.h cached_tests.manifest)
 
+#add_compile_definitions(PQXX_AUTOLINK)
+
 include_directories(..)
 
 add_executable(cached_tests ${srcs})
 
-target_link_libraries(cached_tests Catch2::Catch2WithMain cpp_cached)
+target_link_libraries(cached_tests Catch2::Catch2WithMain cpp_cached) 
 
 target_precompile_headers(cached_tests PRIVATE stdafx.h)
 add_definitions(-DUSING_PCH)

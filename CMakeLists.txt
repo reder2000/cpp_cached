@@ -9,6 +9,7 @@ message("Configuring cpp_cached ...")
 
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Od>")
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Ob0>")
+add_compile_definitions("PQXX_HAVE_CONCEPTS")
 
 include(FetchContent)
 FetchContent_Declare(
@@ -25,13 +26,14 @@ git_include(cpp_rutils "https://github.com/reder2000/cpp_rutils.git")
 
 find_vcpkg_install_missing(cereal)
 find_vcpkg_install_missing(SQLiteCpp)
+find_vcpkg_install_missing(libpqxx)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 file(GLOB srcs CONFIGURE_DEPENDS  cpp_cached/*.h cpp_cached/*.cpp)
 
 add_library (cpp_cached STATIC  ${srcs})
 
-target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils PRIVATE cereal::cereal SQLiteCpp)
+target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils libpqxx::pqxx PRIVATE cereal::cereal SQLiteCpp )
 
 target_precompile_headers(cpp_cached PRIVATE stdafx.h)
 
