@@ -2,7 +2,7 @@
 
 
 PostgresCache::PostgresCache() : _connection(std::vector<std::pair<std::string, std::string>>{
-	{ "dbname", "cppcached" }, { "password","qustrat" }, { "user","postgres" } })
+	{ "dbname", "cppcached" }, { "password","qustrat" }, { "user","postgres" }, { "host","localhost" } })
 {
 	create_db();
 }
