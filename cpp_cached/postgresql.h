@@ -10,6 +10,27 @@
 #include "cache_entry.h"
 #include "time_point.h"
 
+
+#if _MSC_VER
+#if __clang__
+#define PG_CACHE_POSTFIX "_CLANGCL"
+#else
+#define PG_CACHE_POSTFIX "_MSC"
+#endif
+#else
+#define PG_CACHE_POSTFIX "_XXX"
+#endif
+
+#if _DEBUG
+#define PG_CACHE_PREFIX "_DEBUG"
+#else
+#define PG_CACHE_PREFIX "_RELEASE"
+#endif
+
+#define pgCache " pgCache" PG_CACHE_PREFIX PG_CACHE_POSTFIX " "
+
+
+
 class PostgresCache
 {
 
@@ -96,7 +117,7 @@ T PostgresCache::get(const std::string& skey)
 			//auto db = get_db(true);
 			//where = "query2";
 			pqxx::work work(_connection);
-			work.exec_params0("UPDATE cache SET access_count = access_count + 1 WHERE key=$1", key);
+			work.exec_params0("UPDATE " pgCache " SET access_count = access_count + 1 WHERE key=$1", key);
 			//where = "bind2";
 			//query2.bind(1, key);
 			//where = "exec_retry2";
@@ -105,7 +126,7 @@ T PostgresCache::get(const std::string& skey)
 			//where = "query2";
 			std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
 			duration                           dnow = now.time_since_epoch();
-			work.exec_params0("UPDATE cache SET access_time = $1 WHERE key=$2", dnow.count(), key);
+			work.exec_params0("UPDATE " pgCache " SET access_time = $1 WHERE key=$2", dnow.count(), key);
 			//where = "bind3";
 			//bind(query3, dnow.count(), key);
 			//where = "exec_retry3";
