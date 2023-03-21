@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 // memory cache with maximum allocated memory
 // objects to be stored should provide some help
@@ -11,93 +11,102 @@
 #include <cpp_rutils/memory_size.h>
 #include <cpp_rutils/require.h>
 #include <cpp_rutils/literals.h>
+#include <cpp_rutils/unordered_map.h>
+
 #include "cache_imp_exp.h"
 
-class cpp_cached_API LRUCache {
+class cpp_cached_API LRUCache
+{
 
-public:
+ public:
+  LRUCache(size_t maximum_memory = 1_GB);
 
-	LRUCache(size_t maximum_memory = 1_GB);
+  void resize(size_t maximum_memory);
 
-	void resize(size_t maximum_memory);
+  template <class T>
+  void set(const std::string& key, const T& value, std::string_view symbol = {});
 
-	template <class T>
-	void set(const std::string& key, const T& value);
+  bool has(const std::string& key);
 
-	bool has(const std::string& key);
+  void erase(const std::string& key);
+  void erase_symbol(const std::string_view symbol);
 
-	void erase(const std::string& key);
+  template <class T>
+  const T& get(const std::string& key);
 
-	template <class T>
-	const T& get(const std::string& key);
+  // gets a value, compute it if necessary
+  template <class F>
+  const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
 
-	// gets a value, compute it if necessary
-	template <class F>
-	const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
+  static std::shared_ptr<LRUCache> get_default();
 
-	static std::shared_ptr<LRUCache> get_default();
+ private:
+  struct entry
+  {
+    entry() : _mem_used(0) {}
+    template <class T>
+    explicit entry(const T& value);
 
-private:
+    std::any _value;
+    size_t   _mem_used;
+  };
 
-	struct entry {
-		entry() : _mem_used(0) {}
-		template <class T>
-		explicit entry(const T& value);
+  using map_type        = std::unordered_map<std::string, entry>;
+  using map_symbol_type = hl_unordered_map<std::unordered_set<std::string>>;
+  using lru_type        = std::list<std::string>;
 
-		std::any _value;
-		size_t _mem_used;
-	};
+  size_t _maximum_memory;
+  size_t _current_memory;
 
-	using map_type = std::unordered_map<std::string, entry>;
-	using lru_type = std::list<std::string>;
+  const entry& _get(const std::string& key);
 
-	size_t _maximum_memory;
-	size_t _current_memory;
+  void reclaim(size_t memory);
 
-	const entry& _get(const std::string& key);
-
-	void reclaim(size_t memory);
-
-	map_type _map;
-	lru_type _list;
+  map_type        _map;
+  lru_type        _list;
+  map_symbol_type _map_symbol;
 };
 
-inline const  LRUCache::entry& LRUCache::_get(const std::string& key)
+inline const LRUCache::entry& LRUCache::_get(const std::string& key)
 {
-	MREQUIRE(has(key), "{} does not exits", key);
-	return const_cast<map_type*>(&_map)->operator[](key);
+  MREQUIRE(has(key), "{} does not exits", key);
+  return const_cast<map_type*>(&_map)->operator[](key);
 }
 
 
-template<class T>
-LRUCache::entry::entry(const T& value) :
-	_value(value)
+template <class T>
+LRUCache::entry::entry(const T& value) : _value(value)
 {
-	_mem_used = sizeof(std::any) + memory_size(value);
+  _mem_used = sizeof(std::any) + memory_size(value);
 }
 
-template<class T>
-void LRUCache::set(const std::string& key, const T& value)
+template <class T>
+void LRUCache::set(const std::string& key, const T& value, std::string_view symbol)
 {
-	MREQUIRE(!has(key), " {} already exists ", key);
-	entry new_entry(value);
-	reclaim(new_entry._mem_used);
-	_current_memory += new_entry._mem_used;
-	_map[key] = new_entry;
-	_list.push_front(key);
+  MREQUIRE(! has(key), " {} already exists ", key);
+  entry new_entry(value);
+  reclaim(new_entry._mem_used);
+  _current_memory += new_entry._mem_used;
+  _map[key] = new_entry;
+  auto w    = _map_symbol.find(symbol);
+  if (w == _map_symbol.end())
+    _map_symbol.insert({std::string(symbol), std::unordered_set<std::string>{key}});
+  else
+    w->second.insert(key);
+  _list.push_front(key);
 }
 
-template<class T>
+template <class T>
 const T& LRUCache::get(const std::string& key)
 {
-	return std::any_cast<const T&>(_get(key)._value);
+  return std::any_cast<const T&>(_get(key)._value);
 }
 
 template <class F>
 const std::decay_t<std::invoke_result_t<F>>& LRUCache::get(const std::string& key, F callback)
 {
-	using T = std::invoke_result_t<F>;
-	if (this->has(key)) return get<T>(key);
-	set(key, callback());
-	return get<T>(key);
+  using T = std::invoke_result_t<F>;
+  if (this->has(key)) return get<T>(key);
+  set(key, callback());
+  return get<T>(key);
 }

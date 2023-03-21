@@ -1,0 +1,25 @@
+# Format Style Options - Created with Clang Power Tools
+---
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AlwaysBreakTemplateDeclarations: Yes
+BasedOnStyle: Chromium
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Allman
+BreakConstructorInitializers: BeforeColon
+ColumnLimit: 100
+Cpp11BracedListStyle: true
+DerivePointerAlignment: true
+EmptyLineBeforeAccessModifier: Leave
+IndentWidth: 2
+MaxEmptyLinesToKeep: 3
+NamespaceIndentation: All
+ReflowComments: false
+SortIncludes: false
+SpaceAfterLogicalNot: true
+SpaceInEmptyBlock: false
+Standard: Latest
+...
+---
