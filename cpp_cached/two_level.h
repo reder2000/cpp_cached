@@ -31,8 +31,9 @@ class cpp_cached_API TwoLevelCache
   decltype(std::declval<Level1Cache>().template get<T>("")) get(const std::string& key);
 
   void erase(const std::string& key);
+  void erase_symbol(const std::string_view symbol);
   template <class T>
-  void set(const std::string& key, const T& value, std::string_view symbol = {});
+  void set(const std::string& key, const T& value, std::string_view symbol);
   // gets a value, compute it if necessary
   template <class F>
   decltype(std::declval<Level1Cache>().template get<std::invoke_result_t<F>>("")) get(
@@ -58,6 +59,7 @@ bool TwoLevelCache<Level1Cache, Level2Cache>::has(const std::string& key)
   return _level1_cache->has(key) || _level2_cache->has(key);
 }
 
+
 template <is_a_cache Level1Cache, is_a_cache Level2Cache>
 template <class T>
 decltype(std::declval<Level1Cache>().template get<T>(""))
@@ -75,6 +77,13 @@ void TwoLevelCache<Level1Cache, Level2Cache>::erase(const std::string& key)
 {
   _level1_cache->erase(key);
   _level2_cache->erase(key);
+}
+
+template <is_a_cache Level1Cache, is_a_cache Level2Cache>
+void TwoLevelCache<Level1Cache, Level2Cache>::erase_symbol(const std::string_view symbol)
+{
+  _level1_cache->erase_symbol(symbol);
+  _level2_cache->erase_symbol(symbol);
 }
 
 template <is_a_cache Level1Cache, is_a_cache Level2Cache>
