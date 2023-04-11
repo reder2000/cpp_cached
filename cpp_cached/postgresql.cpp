@@ -1,13 +1,23 @@
 #include "postgresql.h"
 
 
+std::vector<std::pair<std::string, std::string>> PostgresCache::get_pg_connection_config()
+{
+  std::vector<std::pair<std::string, std::string>> res;
+  auto add = [&res](std::string_view name, std::string_view value, std::string_view env_name)
+  {
+    auto env_value = std::getenv(env_name.data());
+    res.push_back({std::string(name), env_value ? std::string(env_value) : std::string(value)});
+  };
+  add("dbname", std::string("cpp_cached"), "PGDATABASE");
+  add("password", "qustrat", "PGPASSWORD");
+  add("user", "postgres", "PGUSER");
+  add("host", "localhost", "PGHOST");
+  add("port", "32769", "PGPORT");
+  return res;
+}
 
-PostgresCache::PostgresCache()
-    : _connection(
-          std::vector<std::pair<std::string, std::string>>{{"dbname", std::string("cppcached")},
-                                                           {"password", "qustrat"},
-                                                           {"user", "postgres"},
-                                                           {"host", "localhost"}})
+PostgresCache::PostgresCache() : _connection(get_pg_connection_config())
 {
   create_db();
 }

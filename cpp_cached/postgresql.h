@@ -37,6 +37,7 @@ class PostgresCache
  public:
   //using time_point = std__chrono::utc_clock::time_point;
 
+  static std::vector<std::pair<std::string, std::string>> get_pg_connection_config();
 
   PostgresCache();
   bool has(const std::string& key);
