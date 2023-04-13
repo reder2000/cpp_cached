@@ -269,16 +269,18 @@ T RocksDbCache::get(const std::string& key)
 
 
 ////
-////template <class F>
-////std::invoke_result_t<F> SqliteCache::get(const std::string& key, F callback, time_point d)
-////{
-////  using T      = std::invoke_result_t<F>;
-////  bool has_key = has(key);
-////  if (has_key) return get<T>(key);
-////  T res = callback();
-////  set(key, res, d);
-////  return res;
-////}
+template <class F>
+std::invoke_result_t<F> RocksDbCache::get(const std::string&     key,
+                                          F                      callback,
+                                          cpp_cached::time_point d)
+{
+  using T      = std::invoke_result_t<F>;
+  bool has_key = has(key);
+  if (has_key) return get<T>(key);
+  T res = callback();
+  set(key, res, "", d);
+  return res;
+}
 //template <class F>
 //std::invoke_result_t<F> RocksDbCache::get(const std::string&     key,
 //                                          F                      callback,
