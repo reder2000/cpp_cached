@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <cereal/types/vector.hpp>
 
+#if defined(WITH_POSTGRES)
 TEST_CASE("twolevel", "[cache][hide]")
 {
   auto& two = *MemAndDbCache::get_default();
@@ -31,3 +32,4 @@ TEST_CASE("twolevel", "[cache][hide]")
   CHECK(two.get<double>("2") == 2.);
   erase();
 }
+#endif

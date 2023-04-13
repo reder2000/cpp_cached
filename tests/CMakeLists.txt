@@ -4,6 +4,15 @@ project(cached_tests VERSION 0.1.0)
 find_vcpkg_install_missing(Catch2)
 
 file (GLOB srcs CONFIGURE_DEPENDS *.cpp *.h cached_tests.manifest)
+if (NOT WITH_SQLITE)
+list(FILTER srcs EXCLUDE REGEX .*sqlite.*)
+endif()
+if (NOT WITH_POSTGRES)
+list(FILTER srcs EXCLUDE REGEX .*postgresql.*)
+endif()
+if (NOT WITH_ROCKSDB)
+list(FILTER srcs EXCLUDE REGEX .*rocksdb.*)
+endif()
 
 #add_compile_definitions(PQXX_AUTOLINK)
 

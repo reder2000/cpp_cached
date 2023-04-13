@@ -5,7 +5,6 @@
 #include <cpp_rutils/assign_m.h>
 
 #include "cache_imp_exp.h"
-#include "postgresql.h"
 #include "lru.h"
 
 template <typename T>
@@ -125,9 +124,13 @@ TwoLevelCache<Level1Cache, Level2Cache>::get_default()
   return res;
 }
 
-inline void fun()
-{
-  static_assert(is_a_cache<PostgresCache>);
-}
-
+#if defined(PREFERED_SECONDARY_CACHE_rocksdb)
+#include "rocksdb.h"
+    using MemAndDbCache = TwoLevelCache<LRUCache, RocksDbCache>;
+#elif defined(PREFERED_SECONDARY_CACHE_postgres)
+#include "postgresql.h"
 using MemAndDbCache = TwoLevelCache<LRUCache, PostgresCache>;
+#elif defined(PREFERED_SECONDARY_CACHE_sqlite)
+#include "sqlite.h"
+using MemAndDbCache = TwoLevelCache<LRUCache, SQLite>;
+#endif

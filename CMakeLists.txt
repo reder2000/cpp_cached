@@ -7,9 +7,23 @@ project ("cpp_cached" VERSION 0.1.0
 
 message("Configuring cpp_cached ...")
 
+option(WITH_SQLITE "use sqlite" OFF)
+option(WITH_POSTGRES "use postgres" ON)
+option(WITH_ROCKSDB "use rocksdb" ON)
+set(PREFERED_SECONDARY_CACHE "rocksdb" CACHE STRING "secondary cache")
+
+#message("PREFERED_SECONDARY_CACHE ${PREFERED_SECONDARY_CACHE}")
+if (${PREFERED_SECONDARY_CACHE} STREQUAL "rocksdb")
+add_compile_definitions(PREFERED_SECONDARY_CACHE_rocksdb)
+elseif(${PREFERED_SECONDARY_CACHE} STREQUAL "postgres")
+add_compile_definitions(PREFERED_SECONDARY_CACHE_postgres)
+elseif(${PREFERED_SECONDARY_CACHE} STREQUAL "sqlite")
+add_compile_definitions(PREFERED_SECONDARY_CACHE_sqlite)
+endif()
+
+
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Od>")
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Ob0>")
-add_compile_definitions("PQXX_HAVE_CONCEPTS")
 
 include(FetchContent)
 FetchContent_Declare(
@@ -25,15 +39,35 @@ include(${rr_cmake_SOURCE_DIR}/rr_cmake/common.cmake)
 git_include(cpp_rutils "https://github.com/reder2000/cpp_rutils.git")
 
 find_vcpkg_install_missing(cereal)
-find_vcpkg_install_missing(SQLiteCpp)
-find_vcpkg_install_missing(libpqxx)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 file(GLOB srcs CONFIGURE_DEPENDS  cpp_cached/*.h cpp_cached/*.cpp)
 
+if (WITH_SQLITE)
+message("adding sqlite")
+find_vcpkg_install_missing(SQLiteCpp)
+list(APPEND libs SQLiteCpp)
+else()
+list(FILTER srcs EXCLUDE REGEX .*sqlite.*)
+endif()
+if (WITH_POSTGRES)
+message("adding postgress")
+find_vcpkg_install_missing(libpqxx)
+add_compile_definitions(PQXX_HAVE_CONCEPTS)
+add_compile_definitions(WITH_POSTGRES)
+list(APPEND libs libpqxx::pqxx)
+else()
+list(FILTER srcs EXCLUDE REGEX .*postgresql.*)
+endif()
+if (WITH_ROCKSDB)
+find_vcpkg_install_missing(RocksDB rocksdb[zstd])
+list(APPEND libs RocksDB::rocksdb)
+add_compile_definitions(WITH_ROCKSDB)
+endif()
+
 add_library (cpp_cached STATIC  ${srcs})
 
-target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils libpqxx::pqxx PRIVATE cereal::cereal SQLiteCpp )
+target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils   cereal::cereal ${libs} )
 
 target_precompile_headers(cpp_cached PRIVATE stdafx.h)
 

@@ -1,5 +1,9 @@
 #pragma once
 
+#if ! defined(WITH_POSTGRES)
+#error("WITH_POSTGRES not defined")
+#endif
+
 #include <cpp_rutils/date.h>
 #include <pqxx/pqxx>
 #include <cereal/archives/binary.hpp>
@@ -8,26 +12,10 @@
 #include <cpp_rutils/memstream.h>
 
 #include "cache_entry.h"
+#include "cache_names.h"
 #include "time_point.h"
 
-
-#if _MSC_VER
-#if __clang__
-#define PG_CACHE_POSTFIX "_CLANGCL"
-#else
-#define PG_CACHE_POSTFIX "_MSC"
-#endif
-#else
-#define PG_CACHE_POSTFIX "_XXX"
-#endif
-
-#if _DEBUG
-#define PG_CACHE_PREFIX "_DEBUG"
-#else
-#define PG_CACHE_PREFIX "_RELEASE"
-#endif
-
-#define pgCache " pgCache" PG_CACHE_PREFIX PG_CACHE_POSTFIX " "
+#define pgCache " pgCache" CACHE_NAME_PREFIX CACHE_NAME_POSTFIX " "
 
 
 
