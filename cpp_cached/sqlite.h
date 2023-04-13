@@ -1,5 +1,9 @@
 #pragma once
 
+#if ! defined(WITH_SQLITE)
+#error("WITH_SQLITE must be defined")
+#endif
+
 // disk cache data stored in sqlite db
 
 #include "cache_imp_exp.h"

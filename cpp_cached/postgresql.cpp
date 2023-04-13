@@ -1,5 +1,7 @@
 #include "postgresql.h"
 
+#include "is_a_cache.h"
+
 
 std::vector<std::pair<std::string, std::string>> PostgresCache::get_pg_connection_config()
 {
@@ -256,3 +258,12 @@ std::shared_ptr<PostgresCache> PostgresCache::get_default()
 //  }
 //  throw;
 //}
+
+
+namespace
+{
+  void fun()
+  {
+    static_assert(is_a_cache<PostgresCache>);
+  }
+}  // namespace

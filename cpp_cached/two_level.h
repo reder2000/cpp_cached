@@ -1,5 +1,6 @@
 #pragma once
 
+#include "is_a_cache.h"
 // disk cache data stored in sqlite db
 
 #include <cpp_rutils/assign_m.h>
@@ -7,14 +8,6 @@
 #include "cache_imp_exp.h"
 #include "lru.h"
 
-template <typename T>
-concept is_a_cache =
-    requires(T a) { a.has(std::string{}); } &&
-    requires(T a) { a.template get<int>(std::string{}); } &&
-    requires(T a) { a.erase(std::string{}); } &&
-    requires(T a) { a.set(std::string{}, int{}, std::string_view{}); } &&
-    requires(T a) { a.get(std::string{}, []() -> int { return 0; }); } &&
-    requires(T a) { a.erase_symbol(std::string_view{}); } && requires(T) { T::get_default(); };
 
 template <is_a_cache Level1Cache, is_a_cache Level2Cache>
 class cpp_cached_API TwoLevelCache
@@ -32,7 +25,7 @@ class cpp_cached_API TwoLevelCache
   void erase(const std::string& key);
   void erase_symbol(const std::string_view symbol);
   template <class T>
-  void set(const std::string& key, const T& value, std::string_view symbol);
+  void set(const std::string& key, const T& value, std::string_view symbol = "");
   // gets a value, compute it if necessary
   template <class F>
   decltype(std::declval<Level1Cache>().template get<std::invoke_result_t<F>>("")) get(
@@ -126,7 +119,7 @@ TwoLevelCache<Level1Cache, Level2Cache>::get_default()
 
 #if defined(PREFERED_SECONDARY_CACHE_rocksdb)
 #include "rocksdb.h"
-    using MemAndDbCache = TwoLevelCache<LRUCache, RocksDbCache>;
+using MemAndDbCache = TwoLevelCache<LRUCache, RocksDbCache>;
 #elif defined(PREFERED_SECONDARY_CACHE_postgres)
 #include "postgresql.h"
 using MemAndDbCache = TwoLevelCache<LRUCache, PostgresCache>;

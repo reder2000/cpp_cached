@@ -1,5 +1,7 @@
 #include "rocksdb.h"
 
+#include "is_a_cache.h"
+
 
 RocksDbCache::RocksDbCache(std::filesystem::path   root_path,
                            uint64_t                max_size,
@@ -102,7 +104,8 @@ bool RocksDbCache::has(const std::string& key)
   }
   rocksdb::Status status =
       _connection->Get(rocksdb::ReadOptions{}, std::string("meta_") + key, &value);
-  MREQUIRE(status.ok(), "reading meta key {} failed {}", key, status.ToString());
+  if (! status.ok()) return false;
+  //MREQUIRE(status.ok(), "reading meta key {} failed {}", key, status.ToString());
   auto                               meta  = get_value<RocksdbValueMetaData>(value);
   std__chrono::utc_clock::time_point now   = std__chrono::utc_clock::now();
   auto                               limit = to_duration(now, _rocksdb_cache_granularity);
@@ -188,7 +191,33 @@ std::shared_ptr<RocksDbCache> RocksDbCache::get_default()
 void RocksDbCache::really_erase(const std::string& key)
 {
   _connection->Delete(rocksdb::WriteOptions{}, key);
+  //_connection->Flush(rocksdb::FlushOptions{});
 }
+
+void RocksDbCache::erase_symbol(const std::string_view symbol)
+{
+  std::vector<std::string>           to_erase;
+  std::unique_ptr<rocksdb::Iterator> it(_connection->NewIterator(rocksdb::ReadOptions{}));
+  it->SeekToFirst();
+  //it->Seek("meta_");
+  while (it->Valid())
+  {
+    auto key = it->key().ToString();
+    if (key.starts_with("meta_"))
+    {
+      auto meta = get_value<RocksdbValueMetaData>(it->value().ToString());
+      if (meta._symbol == symbol)
+      {
+        key = key.substr(5);
+        to_erase.push_back(key);
+      }
+    }
+    it->Next();
+  }
+  for (auto const& k : to_erase)
+    erase(k);
+}
+
 //
 //void RocksDbCache::erase_symbol(const std::string_view symbol)
 //{
@@ -301,3 +330,11 @@ void RocksDbCache::really_erase(const std::string& key)
 ////  }
 ////  throw;
 ////}
+
+namespace
+{
+  void fun()
+  {
+    static_assert(is_a_cache<RocksDbCache>);
+  }
+}  // namespace

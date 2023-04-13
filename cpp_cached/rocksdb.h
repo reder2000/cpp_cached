@@ -1,7 +1,7 @@
 #pragma once
 
 #if ! defined(WITH_ROCKSDB)
-#error("WITH_ROCKSDB not defined")
+#error("WITH_ROCKSDB must be defined")
 #endif
 
 #include <filesystem>
@@ -31,14 +31,17 @@ struct RocksdbValueMetaData
   size_t      _duration;
   std::string _type;
   size_t      _size;
+  std::string _symbol;
+  //template <class T>
+  //static RocksdbValueMetaData set(const T& t, RocksdbCacheGranularity rocksdb_cache_granularity);
   template <class T>
-  static RocksdbValueMetaData set(const T& t, RocksdbCacheGranularity rocksdb_cache_granularity);
-  template <class T>
-  static RocksdbValueMetaData get(const T& t, RocksdbCacheGranularity rocksdb_cache_granularity);
+  static RocksdbValueMetaData get(const T&                t,
+                                  std::string_view        symbol,
+                                  RocksdbCacheGranularity rocksdb_cache_granularity);
   template <class Archive>
   void serialize(Archive& ar)
   {
-    ar(_duration, _type, _size);
+    ar(_duration, _type, _size, _symbol);
   }
 };
 
@@ -102,14 +105,15 @@ class RocksDbCache
 
 
 template <class T>
-RocksdbValueMetaData RocksdbValueMetaData::set(const T&                t,
+RocksdbValueMetaData RocksdbValueMetaData::get(const T&                t,
+                                               std::string_view        symbol,
                                                RocksdbCacheGranularity rocksdb_cache_granularity)
 {
   size_t                             sz       = memory_size(t);
   std::string                        type     = std::string(type_name_short<T>().c);
   std__chrono::utc_clock::time_point now      = std__chrono::utc_clock::now();
   size_t                             duration = to_duration(now, rocksdb_cache_granularity);
-  return RocksdbValueMetaData{duration, type, sz};
+  return RocksdbValueMetaData{duration, type, sz, std::string{symbol}};
 }
 
 template <class T>
@@ -141,7 +145,7 @@ void RocksDbCache::set(const std::string&     key,
                        cpp_cached::time_point d)
 {
   MREQUIRE(! has(key));
-  auto                  meta     = RocksdbValueMetaData::set(value, _rocksdb_cache_granularity);
+  auto                  meta = RocksdbValueMetaData::get(value, symbol, _rocksdb_cache_granularity);
   auto                  meta_key = std::string("meta_") + key;
   rocksdb::WriteOptions woptions{};
   _connection->Put(woptions, meta_key, set_value(meta));

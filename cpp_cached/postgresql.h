@@ -1,7 +1,7 @@
 #pragma once
 
 #if ! defined(WITH_POSTGRES)
-#error("WITH_POSTGRES not defined")
+#error("WITH_POSTGRES must be defined")
 #endif
 
 #include <cpp_rutils/date.h>
