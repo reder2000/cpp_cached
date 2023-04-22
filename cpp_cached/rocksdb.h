@@ -3,10 +3,10 @@
 #if ! defined(WITH_ROCKSDB)
 #error("WITH_ROCKSDB must be defined")
 #endif
-
 #include <filesystem>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
+
+#include "serialization.h"
+
 #include <rocksdb/db.h>
 #include <cpp_rutils/literals.h>
 #include <cpp_rutils/memory_size.h>
@@ -119,22 +119,19 @@ RocksdbValueMetaData RocksdbValueMetaData::get(const T&                t,
 template <class T>
 std::string RocksDbCache::set_value(const T& t) const
 {
-  std::ostringstream          out;
-  cereal::BinaryOutputArchive archive(out);
-  //cereal::JSONOutputArchive archive(out);
-  archive(t);
-  return out.str();
+  return cpp_cached_serialization::set_value(t);
 }
 
 template <class T>
 T RocksDbCache::get_value(const std::string& value) const
 {
-  T                          res;
-  imemstream                 sin(value.data(),
-                                 value.size());  //reinterpret_cast<const char*>(col_blob.data()), col_blob.size());
-  cereal::BinaryInputArchive archive(sin);
-  archive(res);
-  return res;
+  //T                          res;
+  //imemstream                 sin(value.data(),
+  //                               value.size());  //reinterpret_cast<const char*>(col_blob.data()), col_blob.size());
+  //cereal::BinaryInputArchive archive(sin);
+  //archive(res);
+  //return res;
+  return cpp_cached_serialization::get_value<T>(value);
 }
 
 

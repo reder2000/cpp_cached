@@ -8,9 +8,12 @@ project ("cpp_cached" VERSION 0.1.0
 message("Configuring cpp_cached ...")
 
 option(WITH_SQLITE "use sqlite" OFF)
-option(WITH_POSTGRES "use postgres" ON)
+option(WITH_POSTGRES "use postgres" OFF)
 option(WITH_ROCKSDB "use rocksdb" ON)
 set(PREFERED_SECONDARY_CACHE "rocksdb" CACHE STRING "secondary cache")
+
+option(WITH_CEREAL "use cereal" OFF)
+option(WITH_ZPP_BITS "use zpp_bits" ON)
 
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Od>")
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Ob0>")
@@ -52,6 +55,17 @@ find_vcpkg_install_missing(RocksDB rocksdb[zstd])
 list(APPEND libs RocksDB::rocksdb)
 endif()
 
+if (WITH_ZPP_BITS)
+find_path(ZPP_BITS_INCLUDE_DIRS "zpp_bits.h")
+ if ("${ZPP_BITS_INCLUDE_DIRS}" STREQUAL "ZPP_BITS_INCLUDE_DIRS-NOTFOUND")
+ vcpkg_install(zpp_bits)
+ find_path(ZPP_BITS_INCLUDE_DIRS "zpp_bits.h")
+ endif()
+endif()
+
+
+
+
 add_library (cpp_cached STATIC  ${srcs})
 
 target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils   cereal::cereal ${libs} )
@@ -76,8 +90,21 @@ elseif(${PREFERED_SECONDARY_CACHE} STREQUAL "sqlite")
 target_compile_definitions(cpp_cached PUBLIC PREFERED_SECONDARY_CACHE_sqlite)
 endif()
 
+if (WITH_CEREAL)
+target_compile_definitions(cpp_cached PUBLIC PREFERED_SERIALIZATION_cereal)
+elseif (WITH_ZPP_BITS)
+target_compile_definitions(cpp_cached PUBLIC PREFERED_SERIALIZATION_zpp_bits)
+else ()
+message(FATAL_ERROR "no serialization choosen")
+endif()
+
+ 
+
+#target_include_directories(cpp_cached PRIVATE ${ZPP_BITS_INCLUDE_DIRS})
+target_include_directories(cpp_cached PRIVATE ${ZPP_BITS_INCLUDE_DIRS})
 
 target_precompile_headers(cpp_cached PRIVATE stdafx.h)
+
 
 if ("${BUILD_SHARED_LIBS}" STREQUAL "ON")
     message("Building shared ${CMAKE_PROJECT_NAME}")
