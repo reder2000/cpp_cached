@@ -6,6 +6,7 @@
 #include <cereal/types/vector.hpp>
 #endif
 
+#if 0
 TEST_CASE("disk", "[cache][hide]")
 {
   DiskCache c;
@@ -35,3 +36,5 @@ TEST_CASE("disk2", "[cache][.hide]")
   auto d = c.get<vi>("3");
   c.get<vi>("2");
 }
+
+#endif

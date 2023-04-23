@@ -5,6 +5,7 @@
 #if defined(PREFERED_SERIALIZATION_cereal)
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
 #endif
 
 TEST_CASE("rocksdb", "[cache][hide]")
@@ -28,6 +29,9 @@ TEST_CASE("rocksdb", "[cache][hide]")
   pc.set("symbol_test_key_2", 2., "test");
   pc.erase_symbol("test");
   CHECK(! pc.has("symbol_test_key"));
+  key = "unit_test_key_sp";
+  pc.really_erase(key);
+  pc.really_erase("meta_" + key);
   std::shared_ptr<const double> psp = std::make_shared<double>(3.14159);
   pc.set(key, psp);
   CHECK_THROWS(pc.set(key, psp));

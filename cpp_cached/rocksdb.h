@@ -10,7 +10,6 @@
 #include <rocksdb/db.h>
 #include <cpp_rutils/literals.h>
 #include <cpp_rutils/memory_size.h>
-#include <cpp_rutils/memstream.h>
 
 #include "time_point.h"
 #include "cache_names.h"

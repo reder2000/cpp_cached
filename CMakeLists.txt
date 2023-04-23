@@ -12,8 +12,8 @@ option(WITH_POSTGRES "use postgres" OFF)
 option(WITH_ROCKSDB "use rocksdb" ON)
 set(PREFERED_SECONDARY_CACHE "rocksdb" CACHE STRING "secondary cache")
 
-option(WITH_CEREAL "use cereal" OFF)
-option(WITH_ZPP_BITS "use zpp_bits" ON)
+option(WITH_CEREAL "use cereal" ON)
+option(WITH_ZPP_BITS "use zpp_bits" OFF)
 
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Od>")
 add_compile_options("$<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:RELWITHDEBINFO>>:/Ob0>")
@@ -61,6 +61,7 @@ find_path(ZPP_BITS_INCLUDE_DIRS "zpp_bits.h")
  vcpkg_install(zpp_bits)
  find_path(ZPP_BITS_INCLUDE_DIRS "zpp_bits.h")
  endif()
+ message(FATAL_ERROR "zpp_bits does not work yet")
 endif()
 
 
