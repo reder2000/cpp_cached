@@ -2,8 +2,10 @@
 
 #define CATCH_CONFIG_ALL_PARTS
 #include <catch2/catch_test_macros.hpp>
+#if defined(PREFERED_SERIALIZATION_cereal)
+#include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
-
+#endif
 
 TEST_CASE("rocksdb", "[cache][hide]")
 {
@@ -26,4 +28,11 @@ TEST_CASE("rocksdb", "[cache][hide]")
   pc.set("symbol_test_key_2", 2., "test");
   pc.erase_symbol("test");
   CHECK(! pc.has("symbol_test_key"));
+  std::shared_ptr<const double> psp = std::make_shared<double>(3.14159);
+  pc.set(key, psp);
+  CHECK_THROWS(pc.set(key, psp));
+  CHECK(pc.has(key));
+  CHECK(fabs(*pc.get<std::shared_ptr<const double>>(key) - 3.14159) < 1e-8);
+  pc.erase(key);
+  CHECK(! pc.has(key));
 }
