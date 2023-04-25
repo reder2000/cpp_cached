@@ -1,3 +1,5 @@
+// different table names for different compilers and configurations
+
 #if _MSC_VER
 #if __clang__
 #define CACHE_NAME_POSTFIX "_CLANGCL"

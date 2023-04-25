@@ -1,4 +1,7 @@
 #pragma once
+
+// try to abstract the serialization in one place
+
 #if defined(PREFERED_SERIALIZATION_cereal)
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>

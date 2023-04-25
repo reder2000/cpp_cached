@@ -1,12 +1,12 @@
 #pragma once
 
 #include "is_a_cache.h"
-// disk cache data stored in sqlite db
 
 #include <cpp_rutils/assign_m.h>
 
 #include "cache_imp_exp.h"
 #include "lru.h"
+#include "mock.h"
 
 
 template <is_a_cache Level1Cache, is_a_cache Level2Cache>
@@ -37,6 +37,8 @@ class cpp_cached_API TwoLevelCache
   std::shared_ptr<Level1Cache> _level1_cache;
   std::shared_ptr<Level2Cache> _level2_cache;
 };
+
+static_assert(is_a_cache<TwoLevelCache<MockCache, MockCache>>);
 
 template <is_a_cache Level1Cache, is_a_cache Level2Cache>
 TwoLevelCache<Level1Cache, Level2Cache>::TwoLevelCache(std::shared_ptr<Level1Cache> level1_cache,

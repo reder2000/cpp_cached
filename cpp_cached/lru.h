@@ -14,6 +14,7 @@
 #include <cpp_rutils/unordered_map.h>
 
 #include "cache_imp_exp.h"
+#include "is_a_cache.h"
 
 class cpp_cached_API LRUCache
 {
@@ -66,6 +67,8 @@ class cpp_cached_API LRUCache
   lru_type        _list;
   map_symbol_type _map_symbol;
 };
+
+static_assert(is_a_cache<LRUCache>);
 
 inline const LRUCache::entry& LRUCache::_get(const std::string& key)
 {
