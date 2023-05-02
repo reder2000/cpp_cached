@@ -127,10 +127,10 @@ T RocksDbCache::get_value(const std::string& value) const
 
 
 template <class T>
-void RocksDbCache::set(const std::string&     key,
-                       const T&               value,
-                       std::string_view       symbol,
-                       cpp_cached::time_point d)
+void RocksDbCache::set(const std::string& key,
+                       const T&           value,
+                       std::string_view   symbol,
+                       cpp_cached::time_point /*d*/)
 {
   MREQUIRE(! has(key));
   auto                  meta = RocksdbValueMetaData::get(value, symbol, _rocksdb_cache_granularity);

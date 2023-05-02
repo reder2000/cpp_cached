@@ -21,6 +21,7 @@ RocksDbCache::RocksDbCache(std::filesystem::path   root_path,
   rocksdb::DB*     db;
   rocksdb::Options options;
   options.create_if_missing = true;
+  options.compression       = rocksdb::CompressionType::kZSTD;
   rocksdb::Status status    = rocksdb::DB::Open(options, db_file.string(), &db);
   MREQUIRE(status.ok(), "opening db failed {}", status.ToString());
   _connection.reset(db);

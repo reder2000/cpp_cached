@@ -10,7 +10,7 @@
 #define CACHE_NAME_POSTFIX "_XXX"
 #endif
 
-#if _DEBUG
+#if defined(_DEBUG)
 #define CACHE_NAME_PREFIX "_DEBUG"
 #else
 #define CACHE_NAME_PREFIX "_RELEASE"
