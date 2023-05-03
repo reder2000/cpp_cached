@@ -28,8 +28,8 @@ class cpp_cached_API DiskCache
   template <class T>
   T get(const std::string& key) const;
 
-  template <class F>
-  const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
+  //template <class F>
+  //const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
 
   void erase(const std::string& key);
 
@@ -76,13 +76,4 @@ T DiskCache::get(const std::string& key) const
   buffer << fin.rdbuf();
   T res = cpp_cached_serialization::get_value<T>(buffer.str());
   return res;
-}
-
-template <class F>
-const std::decay_t<std::invoke_result_t<F>>& DiskCache::get(const std::string& key, F callback)
-{
-  using T = std::invoke_result_t<F>;
-  if (this->has(key)) return get<T>(key);
-  set(key, callback());
-  return get<T>(key);
 }

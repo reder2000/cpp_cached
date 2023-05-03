@@ -3,7 +3,6 @@
 #define CATCH_CONFIG_ALL_PARTS
 #include <catch2/catch_test_macros.hpp>
 #if defined(PREFERED_SERIALIZATION_cereal)
-#include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
 #endif

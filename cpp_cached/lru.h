@@ -36,8 +36,8 @@ class cpp_cached_API LRUCache
   const T& get(const std::string& key);
 
   // gets a value, compute it if necessary
-  template <class F>
-  const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
+  //template <class F>
+  //const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
 
   static std::shared_ptr<LRUCache> get_default();
 
@@ -105,11 +105,11 @@ const T& LRUCache::get(const std::string& key)
   return std::any_cast<const T&>(_get(key)._value);
 }
 
-template <class F>
-const std::decay_t<std::invoke_result_t<F>>& LRUCache::get(const std::string& key, F callback)
-{
-  using T = std::invoke_result_t<F>;
-  if (this->has(key)) return get<T>(key);
-  set(key, callback());
-  return get<T>(key);
-}
+//template <class F>
+//const std::decay_t<std::invoke_result_t<F>>& LRUCache::get(const std::string& key, F callback)
+//{
+//  using T = std::invoke_result_t<F>;
+//  if (this->has(key)) return get<T>(key);
+//  set(key, callback());
+//  return get<T>(key);
+//}

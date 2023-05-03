@@ -72,8 +72,8 @@ class RocksDbCache
            cpp_cached::time_point d      = {});
 
   // gets a value, compute it if necessary
-  template <class F>
-  std::invoke_result_t<F> get(const std::string& key, F callback, cpp_cached::time_point d = {});
+  //template <class F>
+  //std::invoke_result_t<F> get(const std::string& key, F callback, cpp_cached::time_point d = {});
 
   size_t total_size() const;
   void   clean_expired();
@@ -151,15 +151,15 @@ T RocksDbCache::get(const std::string& key)
 }
 
 
-template <class F>
-std::invoke_result_t<F> RocksDbCache::get(const std::string&     key,
-                                          F                      callback,
-                                          cpp_cached::time_point d)
-{
-  using T      = std::invoke_result_t<F>;
-  bool has_key = has(key);
-  if (has_key) return get<T>(key);
-  T res = callback();
-  set(key, res, "", d);
-  return res;
-}
+//template <class F>
+//std::invoke_result_t<F> RocksDbCache::get(const std::string&     key,
+//                                          F                      callback,
+//                                          cpp_cached::time_point d)
+//{
+//  using T      = std::invoke_result_t<F>;
+//  bool has_key = has(key);
+//  if (has_key) return get<T>(key);
+//  T res = callback();
+//  set(key, res, "", d);
+//  return res;
+//}

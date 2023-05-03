@@ -29,8 +29,8 @@ class cpp_cached_API MockCache
   T get(const std::string& key);
 
   // gets a value, compute it if necessary
-  template <class F>
-  std::invoke_result_t<F> get(const std::string& key, F callback);
+  //template <class F>
+  //std::invoke_result_t<F> get(const std::string& key, F callback);
 
   static std::shared_ptr<MockCache> get_default();
 };
@@ -50,9 +50,9 @@ T MockCache::get(const std::string& key)
   return T{};
 }
 
-template <class F>
-std::invoke_result_t<F> MockCache::get(const std::string& key, F /*callback*/)
-{
-  using T = std::invoke_result_t<F>;
-  return get<T>(key);
-}
+//template <class F>
+//std::invoke_result_t<F> MockCache::get(const std::string& key, F /*callback*/)
+//{
+//  using T = std::invoke_result_t<F>;
+//  return get<T>(key);
+//}

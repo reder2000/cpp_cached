@@ -27,10 +27,10 @@ class cpp_cached_API TwoLevelCache
   template <class T>
   void set(const std::string& key, const T& value, std::string_view symbol = "");
   // gets a value, compute it if necessary
-  template <class F>
-  decltype(std::declval<Level1Cache>().template get<std::invoke_result_t<F>>("")) get(
-      const std::string& key,
-      F                  callback);
+  //template <class F>
+  //decltype(std::declval<Level1Cache>().template get<std::invoke_result_t<F>>("")) get(
+  //    const std::string& key,
+  //    F                  callback);
 
   static std::shared_ptr<TwoLevelCache> get_default();
 
@@ -90,25 +90,25 @@ void TwoLevelCache<Level1Cache, Level2Cache>::set(const std::string& key,
   _level2_cache->set(key, value, symbol);
 }
 
-template <is_a_cache Level1Cache, is_a_cache Level2Cache>
-template <class F>
-decltype(std::declval<Level1Cache>().template get<std::invoke_result_t<F>>(""))
-TwoLevelCache<Level1Cache, Level2Cache>::get(const std::string& key, F callback)
-{
-  using T = std::invoke_result_t<F>;
-
-  if (_level1_cache->has(key)) return _level1_cache->template get<T>(key);
-  if (_level2_cache->has(key))
-  {
-    T res = _level2_cache->template get<T>(key);
-    _level1_cache->set(key, res);
-    return _level1_cache->template get<T>(key);
-  }
-  T res = callback();
-  _level2_cache->set(key, res);
-  _level1_cache->set(key, res);
-  return _level1_cache->template get<T>(key);
-}
+//template <is_a_cache Level1Cache, is_a_cache Level2Cache>
+//template <class F>
+//decltype(std::declval<Level1Cache>().template get<std::invoke_result_t<F>>(""))
+//TwoLevelCache<Level1Cache, Level2Cache>::get(const std::string& key, F callback)
+//{
+//  using T = std::invoke_result_t<F>;
+//
+//  if (_level1_cache->has(key)) return _level1_cache->template get<T>(key);
+//  if (_level2_cache->has(key))
+//  {
+//    T res = _level2_cache->template get<T>(key);
+//    _level1_cache->set(key, res);
+//    return _level1_cache->template get<T>(key);
+//  }
+//  T res = callback();
+//  _level2_cache->set(key, res);
+//  _level1_cache->set(key, res);
+//  return _level1_cache->template get<T>(key);
+//}
 
 template <is_a_cache Level1Cache, is_a_cache Level2Cache>
 std::shared_ptr<TwoLevelCache<Level1Cache, Level2Cache>>
