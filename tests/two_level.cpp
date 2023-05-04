@@ -7,7 +7,7 @@
 #include <cereal/types/vector.hpp>
 #endif
 
-#if defined(WITH_POSTGRES)
+//#if defined(WITH_POSTGRES)
 TEST_CASE("twolevel", "[cache][hide]")
 {
   auto& two = *MemAndDbCache::get_default();
@@ -28,11 +28,11 @@ TEST_CASE("twolevel", "[cache][hide]")
   CHECK(two.get<int>("1") == 2);
   two.set("2", 2., "");
   CHECK(sql->has("2"));
-  auto const& j = two.get("3", []() { return 3.; });
+  auto const& j = cache_get(two, "3", []() { return 3.; });
   CHECK(mem->has("3"));
   const_cast<double&>(j) = 4.;
   CHECK(two.get<double>("3") == 4);
   CHECK(two.get<double>("2") == 2.);
   erase();
 }
-#endif
+//#endif

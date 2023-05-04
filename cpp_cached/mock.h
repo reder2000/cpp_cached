@@ -17,6 +17,9 @@ class cpp_cached_API MockCache
   MockCache() = default;
 
   template <class T>
+  using return_type = std::decay_t<T>;
+
+  template <class T>
   void set(const std::string& key, const T& value, std::string_view = {});
 
   bool has(std::string_view key);

@@ -17,6 +17,9 @@ class cpp_cached_API DiskCache
 {
 
  public:
+  template <class T>
+  using return_type = std::decay_t<T>;
+
   DiskCache(
       std::filesystem::path root_path = std::filesystem::temp_directory_path().append("cache"));
 

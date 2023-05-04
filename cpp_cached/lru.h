@@ -20,6 +20,9 @@ class cpp_cached_API LRUCache
 {
 
  public:
+  template <class T>
+  using return_type = const std::decay_t<T>&;
+
   LRUCache(size_t maximum_memory = 1_GB);
 
   void resize(size_t maximum_memory);
@@ -33,7 +36,7 @@ class cpp_cached_API LRUCache
   void erase_symbol(const std::string_view symbol);
 
   template <class T>
-  const T& get(const std::string& key);
+  const std::decay_t<T>& get(const std::string& key);
 
   // gets a value, compute it if necessary
   //template <class F>
@@ -100,9 +103,10 @@ void LRUCache::set(const std::string& key, const T& value, std::string_view symb
 }
 
 template <class T>
-const T& LRUCache::get(const std::string& key)
+const std::decay_t<T>& LRUCache::get(const std::string& key)
 {
-  return std::any_cast<const T&>(_get(key)._value);
+  using R = typename std::decay_t<T>;
+  return std::any_cast<const R&>(_get(key)._value);
 }
 
 //template <class F>

@@ -14,6 +14,9 @@ class cpp_cached_API TwoLevelCache
 {
 
  public:
+  template <class T>
+  using return_type = typename Level1Cache::template return_type<T>;
+
   TwoLevelCache(std::shared_ptr<Level1Cache> level1_cache,
                 std::shared_ptr<Level2Cache> level2_cache);
 

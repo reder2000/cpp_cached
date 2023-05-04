@@ -49,10 +49,10 @@ namespace cpp_cached_serialization
 
 #if defined(PREFERED_SERIALIZATION_cereal)
   template <class T>
-  T get_value(const std::string& value)
+  std::decay_t<T> get_value(const std::string& value)
   {
-    T          res;
-    imemstream sin(
+    std::decay_t<T> res;
+    imemstream      sin(
         value.data(),
         value.size());  //reinterpret_cast<const char*>(col_blob.data()), col_blob.size());
     cereal::BinaryInputArchive archive(sin);

@@ -52,6 +52,9 @@ struct RocksdbValueMetaData
 class RocksDbCache
 {
  public:
+  template <class T>
+  using return_type = std::decay_t<T>;
+
   // to be enforced
   static constexpr size_t default_max_size = 8_GB;
 
@@ -64,7 +67,7 @@ class RocksDbCache
   bool has(const std::string& key);
   void erase(const std::string& key);
   template <class T>
-  T get(const std::string& key);
+  std::decay_t<T> get(const std::string& key);
   template <class T>
   void set(const std::string&     key,
            const T&               value,
@@ -95,7 +98,7 @@ class RocksDbCache
   template <class T>
   std::string set_value(const T& t) const;
   template <class T>
-  T get_value(const std::string& t) const;
+  std::decay_t<T> get_value(const std::string& t) const;
 };
 
 static_assert(is_a_cache<RocksDbCache>);
@@ -120,7 +123,7 @@ std::string RocksDbCache::set_value(const T& t) const
 }
 
 template <class T>
-T RocksDbCache::get_value(const std::string& value) const
+std::decay_t<T> RocksDbCache::get_value(const std::string& value) const
 {
   return cpp_cached_serialization::get_value<T>(value);
 }
@@ -142,7 +145,7 @@ void RocksDbCache::set(const std::string& key,
 
 
 template <class T>
-T RocksDbCache::get(const std::string& key)
+std::decay_t<T> RocksDbCache::get(const std::string& key)
 {
   MREQUIRE(has(key), "{} not found in DB", key);
   std::string value;
