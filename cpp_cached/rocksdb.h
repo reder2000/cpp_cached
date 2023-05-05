@@ -78,7 +78,7 @@ class RocksDbCache
   //template <class F>
   //std::invoke_result_t<F> get(const std::string& key, F callback, cpp_cached::time_point d = {});
 
-  size_t total_size() const;
+  [[nodiscard]] size_t total_size() const;
   void   clean_expired();
   void   clean_older(int64_t need_to_free);
 
@@ -93,12 +93,12 @@ class RocksDbCache
 
   void really_erase(const std::string& key);
 
-  void erase_symbol(const std::string_view symbol);
+  void erase_symbol(std::string_view symbol);
 
   template <class T>
   std::string set_value(const T& t) const;
   template <class T>
-  std::decay_t<T> get_value(const std::string& t) const;
+  std::decay_t<T> get_value(const std::string& s_key) const;
 };
 
 static_assert(is_a_cache<RocksDbCache>);

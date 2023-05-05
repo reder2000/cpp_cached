@@ -4,17 +4,17 @@ std::string machine_name()
 {
 #if _MSC_VER
 #if __clang__
-#define MACHIN_PREFIX "CLANGCL"
+#define MACHINE_PREFIX "CLANGCL"
 #else
-#define MACHIN_PREFIX "MSC"
+#define MACHINE_PREFIX "MSC"
 #endif
 #else
-#define MACHIN_PREFIX "XXX"
+#define MACHINE_PREFIX "XXX"
 #endif
 
 #if _DEBUG
-	return MACHIN_PREFIX "_DEBUG";
+	return MACHINE_PREFIX "_DEBUG";
 #else
-	return MACHIN_PREFIX "_RELEASE";
+	return MACHINE_PREFIX "_RELEASE";
 #endif
 }

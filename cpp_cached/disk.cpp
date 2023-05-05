@@ -102,14 +102,14 @@ DiskCache::DiskCache(path root_path) : _root_path(std::move(root_path))
 
 bool DiskCache::has(const std::string& key) const
 {
-  auto fp  = get_full_path_splitted(key);
+  auto fp  = get_full_path_split(key);
   bool res = std::filesystem::exists(fp);
   return res;
 }
 
 void DiskCache::erase(const std::string& key)
 {
-  auto fp = get_full_path_splitted(key);
+  auto fp = get_full_path_split(key);
   if (exists(fp))
   {
     std::filesystem::remove(fp);
@@ -121,7 +121,7 @@ void DiskCache::erase_symbol(const std::string_view /*symbol*/)
   MFAIL("erase_symbol is not implemented");
 }
 
-std::filesystem::path DiskCache::get_full_path_splitted(const std::string& key) const
+std::filesystem::path DiskCache::get_full_path_split(const std::string& key) const
 {
   auto res = ::get_full_path(_root_path, key);
   return res;

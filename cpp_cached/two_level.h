@@ -26,7 +26,7 @@ class cpp_cached_API TwoLevelCache
   decltype(std::declval<Level1Cache>().template get<T>("")) get(const std::string& key);
 
   void erase(const std::string& key);
-  void erase_symbol(const std::string_view symbol);
+  void erase_symbol(std::string_view symbol);
   template <class T>
   void set(const std::string& key, const T& value, std::string_view symbol = "");
   // gets a value, compute it if necessary
@@ -122,13 +122,13 @@ TwoLevelCache<Level1Cache, Level2Cache>::get_default()
   return res;
 }
 
-#if defined(PREFERED_SECONDARY_CACHE_rocksdb)
+#if defined(PREFERRED_SECONDARY_CACHE_rocksdb)
 #include "rocksdb.h"
 using MemAndDbCache = TwoLevelCache<LRUCache, RocksDbCache>;
-#elif defined(PREFERED_SECONDARY_CACHE_postgres)
+#elif defined(PREFERRED_SECONDARY_CACHE_postgres)
 #include "postgresql.h"
 using MemAndDbCache = TwoLevelCache<LRUCache, PostgresCache>;
-#elif defined(PREFERED_SECONDARY_CACHE_sqlite)
+#elif defined(PREFERRED_SECONDARY_CACHE_sqlite)
 #include "sqlite.h"
 using MemAndDbCache = TwoLevelCache<LRUCache, SQLite>;
 #endif

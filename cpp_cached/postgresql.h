@@ -69,7 +69,7 @@ class PostgresCache
 };
 
 template <class T>
-T PostgresCache::get(const std::string& skey)
+T PostgresCache::get(const std::string& s_key)
 {
   //using namespace SQLite;
   using duration = std__chrono::utc_clock::duration;
@@ -77,8 +77,8 @@ T PostgresCache::get(const std::string& skey)
   std::string where = "get_db";
   try
   {
-    auto key = skey.c_str();
-    MREQUIRE(has(skey), "{} not found in DB", skey);
+    auto key = s_key.c_str();
+    MREQUIRE(has(s_key), "{} not found in DB", s_key);
     {
       // get blob
       where = "blob get_db";
@@ -93,10 +93,10 @@ T PostgresCache::get(const std::string& skey)
       work.commit();
       auto [col_blob] = r[0].as<std::basic_string<std::byte>>();
       //if (! success) return res;
-      //MREQUIRE(success, "getting blob failed for {}", skey);
+      //MREQUIRE(success, "getting blob failed for {}", s_key);
       //where = "blob getColumn";
       //auto col_blob = query.getColumn(6);
-      //where = "blob getblob";
+      //where = "blob get_blob";
       imemstream sin(reinterpret_cast<const char*>(col_blob.data()), col_blob.size());
       cereal::BinaryInputArchive archive(sin);
       //cereal::JSONInputArchive archive(sin);
@@ -119,10 +119,10 @@ T PostgresCache::get(const std::string& skey)
       ////query2.exec();
       //where = "query2";
       std__chrono::utc_clock::time_point now  = std__chrono::utc_clock::now();
-      duration                           dnow = now.time_since_epoch();
-      work.exec_params0("UPDATE " pgCache " SET access_time = $1 WHERE key=$2", dnow.count(), key);
+      duration                           d_now = now.time_since_epoch();
+      work.exec_params0("UPDATE " pgCache " SET access_time = $1 WHERE key=$2", d_now.count(), key);
       //where = "bind3";
-      //bind(query3, dnow.count(), key);
+      //bind(query3, d_now.count(), key);
       //where = "exec_retry3";
       //exec_retry(db, query3);
       work.commit();
@@ -175,10 +175,10 @@ void PostgresCache::set(const std::string&     key,
                                     out.str().size());
   pqxx::work                   work(_connection);
   work.exec_prepared0("set", key, std::string{symbol}, values.store_time, values.expire_time,
-                      values.access_time, values.accesss_count, sz, blob);
+                      values.access_time, values.access_count, sz, blob);
   //int i_sz = static_cast<int>(sz);
   //bind(query, key.c_str(), values.store_time, values.expire_time, values.access_time,
-  //	values.accesss_count, i_sz);
+  //	values.access_count, i_sz);
   //query.bind(7, reinterpret_cast<const void*>(out.str().c_str()), i_sz);
   //query.exec();
   work.commit();

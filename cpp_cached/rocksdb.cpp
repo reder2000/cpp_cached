@@ -48,10 +48,10 @@ size_t to_duration(std__chrono::utc_clock::time_point tp,
 
 bool RocksDbCache::has(const std::string& key)
 {
-  std::string whatfor;
-  if (! _connection->KeyMayExist(rocksdb::ReadOptions{}, key, &whatfor)) return false;
+  std::string what_for;
+  if (! _connection->KeyMayExist(rocksdb::ReadOptions{}, key, &what_for)) return false;
   std::string value;
-  if (! _connection->KeyMayExist(rocksdb::ReadOptions{}, "meta_" + key, &whatfor))
+  if (! _connection->KeyMayExist(rocksdb::ReadOptions{}, "meta_" + key, &what_for))
   {  // bad state: meta but no key
     really_erase(key);
     return false;

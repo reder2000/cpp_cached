@@ -96,7 +96,7 @@ bool SqliteCache::has(const std::string& key)
 	}
 }
 
-bool SqliteCache::is_expired(const std::string& skey)
+bool SqliteCache::is_expired(const std::string& s_key)
 {
 	// asuming has
 	using duration = std__chrono::utc_clock::duration;
@@ -106,12 +106,12 @@ bool SqliteCache::is_expired(const std::string& skey)
 	where = "query0";
 	Statement query = query_retry(db, "SELECT expire_time FROM CACHE where key = ?");
 	where = "bind0";
-	auto key = skey.c_str();
+	auto key = s_key.c_str();
 	query.bind(1, key);
 	where = "executeStep_retry";
 	auto success = executeStep_retry(db, query);
 	//if (! success) return res;
-	MREQUIRE(success, "{} not in db", skey);
+	MREQUIRE(success, "{} not in db", s_key);
 	where = "getColumns";
 	int64_t i_expire_time = query.getColumn(0).getInt64();
 	//auto    values = query.getColumns<cache_row_value, 6>();
@@ -163,7 +163,7 @@ void SqliteCache::clean_expired(Database& db)
 	{
 		auto key = query0.getColumn(0).getString();
 		keys.push_back(key);
-	};
+	} {}
 	if (!keys.empty()) fmt::print("cache will remove expired {}\n", fmt::join(keys, "\n"));
 	Statement query(db, "DELETE FROM cache WHERE expire_time < ?");
 	query.bind(1, cnow);

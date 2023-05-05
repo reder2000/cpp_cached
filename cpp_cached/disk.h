@@ -29,21 +29,21 @@ class cpp_cached_API DiskCache
   [[nodiscard]] bool has(const std::string& key) const;
 
   template <class T>
-  T get(const std::string& key) const;
+  [[nodiscard]] T get(const std::string& key) const;
 
   //template <class F>
   //const std::decay_t<std::invoke_result_t<F>>& get(const std::string& key, F callback);
 
   void erase(const std::string& key);
 
-  void erase_symbol(const std::string_view symbol);
+  void erase_symbol(std::string_view symbol);
 
   static std::shared_ptr<DiskCache> get_default();
 
  private:
   std::filesystem::path _root_path;
 
-  [[nodiscard]] std::filesystem::path get_full_path_splitted(const std::string& key) const;
+  [[nodiscard]] std::filesystem::path get_full_path_split(const std::string& key) const;
 };
 
 static_assert(is_a_cache<DiskCache>);
@@ -52,7 +52,7 @@ static_assert(is_a_cache<DiskCache>);
 template <class T>
 void DiskCache::set(const std::string& key, const T& value, std::string_view)
 {
-  auto fn = get_full_path_splitted(key);
+  auto fn = get_full_path_split(key);
   auto fp = fn;
   create_directories(fp.remove_filename());
   std::ofstream fout;
@@ -73,7 +73,7 @@ void DiskCache::set(const std::string& key, const T& value, std::string_view)
 template <class T>
 T DiskCache::get(const std::string& key) const
 {
-  auto              fp = get_full_path_splitted(key);
+  auto              fp = get_full_path_split(key);
   std::ifstream     fin(fp, std::ios::binary);
   std::stringstream buffer;
   buffer << fin.rdbuf();

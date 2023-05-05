@@ -1,6 +1,6 @@
 #pragma once
 
-// used for buiding a shared library
+// used for building a shared library
 
 #pragma warning(disable:4251)
 

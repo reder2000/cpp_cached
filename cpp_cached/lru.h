@@ -33,7 +33,7 @@ class cpp_cached_API LRUCache
   bool has(const std::string& key);
 
   void erase(const std::string& key);
-  void erase_symbol(const std::string_view symbol);
+  void erase_symbol(std::string_view symbol);
 
   template <class T>
   const std::decay_t<T>& get(const std::string& key);

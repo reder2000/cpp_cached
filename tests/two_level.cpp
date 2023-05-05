@@ -8,11 +8,11 @@
 #endif
 
 //#if defined(WITH_POSTGRES)
-TEST_CASE("twolevel", "[cache][hide]")
+TEST_CASE("two_levels", "[cache][hide]")
 {
   auto& two = *MemAndDbCache::get_default();
-  auto  mem = two._level1_cache;
-  auto  sql = two._level2_cache;
+  auto& mem = *two._level1_cache;
+  auto& sql = *two._level2_cache;
 
   auto erase = [&two]()
   {
@@ -21,17 +21,19 @@ TEST_CASE("twolevel", "[cache][hide]")
     two.erase("3");
   };
   erase();
-  sql->set("1", 1);
+  sql.set("1", 1);
   CHECK(two.has("1"));
   auto const& i       = two.get<int>("1");
   const_cast<int&>(i) = 2;
   CHECK(two.get<int>("1") == 2);
+  CHECK(mem.get<int>("1") == 2);
   two.set("2", 2., "");
-  CHECK(sql->has("2"));
+  CHECK(sql.has("2"));
   auto const& j = cache_get(two, "3", []() { return 3.; });
-  CHECK(mem->has("3"));
+  CHECK(mem.has("3"));
   const_cast<double&>(j) = 4.;
   CHECK(two.get<double>("3") == 4);
+  CHECK(mem.get<double>("3") == 4);
   CHECK(two.get<double>("2") == 2.);
   erase();
 }

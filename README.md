@@ -4,7 +4,7 @@ cpp_cached is a collection of data caching schemes:
 - memory LRU 
 - disk one file per object
 - sqlite backend
-- postgre backend
+- postgresql backend
 - rocksdb backend
 - a combination of two of the previous caches (usually mem first)
 

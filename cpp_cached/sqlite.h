@@ -79,7 +79,7 @@ private:
 };
 
 template <class T>
-T SqliteCache::get(const std::string& skey)
+T SqliteCache::get(const std::string& s_key)
 {
 	using namespace SQLite;
 	using duration = std__chrono::utc_clock::duration;
@@ -87,8 +87,8 @@ T SqliteCache::get(const std::string& skey)
 	std::string where = "get_db";
 	try
 	{
-		auto key = skey.c_str();
-		MREQUIRE(has(skey), "{} not found in DB", skey);
+		auto key = s_key.c_str();
+		MREQUIRE(has(s_key), "{} not found in DB", s_key);
 		{
 			// get blob
 			where = "blob get_db";
@@ -100,7 +100,7 @@ T SqliteCache::get(const std::string& skey)
 			where = "blob executeStep";
 			auto success = executeStep_retry(db, query);
 			//if (! success) return res;
-			MREQUIRE(success, "getting blob failed for {}", skey);
+			MREQUIRE(success, "getting blob failed for {}", s_key);
 			where = "blob getColumn";
 			auto col_blob = query.getColumn(6);
 			where = "blob getblob";
@@ -126,9 +126,9 @@ T SqliteCache::get(const std::string& skey)
 			where = "query2";
 			Statement query3 = query_retry(db, "UPDATE cache SET access_time = ? WHERE key=?");
 			std__chrono::utc_clock::time_point now = std__chrono::utc_clock::now();
-			duration                           dnow = now.time_since_epoch();
+			duration                           d_now = now.time_since_epoch();
 			where = "bind3";
-			bind(query3, dnow.count(), key);
+			bind(query3, d_now.count(), key);
 			where = "exec_retry3";
 			exec_retry(db, query3);
 		}
@@ -173,7 +173,7 @@ void SqliteCache::set(const std::string& key, const T& value, time_point d)
 	}
 	int i_sz = static_cast<int>(sz);
 	bind(query, key.c_str(), values.store_time, values.expire_time, values.access_time,
-		values.accesss_count, i_sz);
+		values.access_count, i_sz);
 	query.bind(7, reinterpret_cast<const void*>(out.str().c_str()), i_sz);
 	query.exec();
 }
