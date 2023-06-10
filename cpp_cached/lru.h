@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <any>
 #include <list>
+#include <mutex>
+
 #include <cpp_rutils/memory_size.h>
 #include <cpp_rutils/require.h>
 #include <cpp_rutils/literals.h>
@@ -69,6 +71,8 @@ class cpp_cached_API LRUCache
   map_type        _map;
   lru_type        _list;
   map_symbol_type _map_symbol;
+
+  std::mutex _mutex;
 };
 
 static_assert(is_a_cache<LRUCache>);
@@ -90,7 +94,8 @@ template <class T>
 void LRUCache::set(const std::string& key, const T& value, std::string_view symbol)
 {
   MREQUIRE(! has(key), " {} already exists ", key);
-  entry new_entry(value);
+  std::lock_guard<std::mutex> guard(_mutex);
+  entry                       new_entry(value);
   reclaim(new_entry._mem_used);
   _current_memory += new_entry._mem_used;
   _map[key] = new_entry;

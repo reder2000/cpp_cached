@@ -2,3 +2,4 @@ build
 mybuild*/
 cmake-build-*/
 .idea/
+.vs/
