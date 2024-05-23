@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include "cache_imp_exp.h"
-#include <fmt/format.h>
+#include <cpp_rutils/format.h>
 #include <cpp_rutils/name_short.h>
 
 #include "is_a_cache.h"
@@ -43,13 +43,13 @@ static_assert(is_a_cache<MockCache>);
 template <class T>
 void MockCache::set(const std::string& key, const T& /*value*/, std::string_view)
 {
-  fmt::print("MockCache::set key {} value of type {}\n", key, type_name_short<T>());
+  std__print("MockCache::set key {} value of type {}\n", key, type_name_short<T>());
 }
 
 template <class T>
 T MockCache::get(const std::string& key)
 {
-  fmt::print("MockCache::get key {}\n", key);
+  std__print("MockCache::get key {}\n", key);
   return T{};
 }
 

@@ -2,18 +2,18 @@
 
 bool MockCache::has(std::string_view key)
 {
-  fmt::print("MockCache::has key {}\n", key);
+  std__print("MockCache::has key {}\n", key);
   return true;
 }
 
 void MockCache::erase(std::string_view key)
 {
-  fmt::print("MockCache::erase key {}\n", key);
+  std__print("MockCache::erase key {}\n", key);
 }
 
 void MockCache::erase_symbol(std::string_view key)
 {
-  fmt::print("MockCache::erase_symbol key {}\n", key);
+  std__print("MockCache::erase_symbol key {}\n", key);
 }
 
 std::shared_ptr<MockCache> MockCache::get_default()

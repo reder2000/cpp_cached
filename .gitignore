@@ -3,3 +3,4 @@ mybuild*/
 cmake-build-*/
 .idea/
 .vs/
+CMakeSettings.json

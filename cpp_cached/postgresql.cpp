@@ -183,7 +183,7 @@ void PostgresCache::clean_expired()
   //    auto key = query0.getColumn(0).getString();
   //    keys.push_back(key);
   //  };
-  //  if (! keys.empty()) fmt::print("cache will remove expired {}\n", fmt::join(keys, "\n"));
+  //  if (! keys.empty()) std__print("cache will remove expired {}\n", fmt::join(keys, "\n"));
   //  Statement query(db, "DELETE FROM cache WHERE expire_time < ?");
   //  query.bind(1, cnow);
   //  query.exec();
@@ -199,12 +199,12 @@ void PostgresCache::clean_older(int64_t need_to_free)
 {
   //  Statement query(db, "SELECT key,size FROM cache ORDER BY store_time");
   //  int64_t   fred = 0;
-  //  fmt::print("clean_older\n");
+  //  std__print("clean_older\n");
   //  while (query.executeStep() && fred < need_to_free)
   //  {
   //    auto key = query.getColumn(0).getString();
   //    auto sz  = query.getColumn(1).getInt64();
-  //    fmt::print("cache reclaim size {} will remove key {} sz {}\n", need_to_free - fred, key, sz);
+  //    std__print("cache reclaim size {} will remove key {} sz {}\n", need_to_free - fred, key, sz);
   //    fred += sz;
   //    Statement query2(db, "DELETE FROM cache where key=?");
   //    query2.bind(1, key);

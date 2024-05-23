@@ -1,6 +1,6 @@
 #include "disk.h"
 #include <algorithm>
-#include <fmt/chrono.h>
+//#include <fmt/chrono.h>
 #include <cpp_rutils/literals.h>
 
 #if defined(__GNUC__)
@@ -96,7 +96,8 @@ DiskCache::DiskCache(path root_path) : _root_path(std::move(root_path))
   time_t tt;
   time(&tt);
   struct tm tm = m_localtime_s(tt);
-  auto      s  = fmt::format("{:%Y-%m-%d}", tm);
+  // auto      s  = std__format("{:%Y-%m-%d}", tm);
+  auto      s  = std__format("{:04d}-{:02d}-{:02d}", tm.tm_year+1900,tm.tm_mon+1,tm.tm_mday);
   _root_path.append(s);
 }
 

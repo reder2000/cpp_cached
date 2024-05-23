@@ -135,7 +135,7 @@ T SqliteCache::get(const std::string& s_key)
 	}
 	catch (std::exception& e)
 	{
-		//fmt::print("failed reading blob : {} \n", where);
+		//std__print("failed reading blob : {} \n", where);
 		throw std::runtime_error(fmt::format("failed reading blob at {} since {}\n", where, e.what()));
 	}
 	return res;
