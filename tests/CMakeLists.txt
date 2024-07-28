@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.30)
 project(cached_tests VERSION 0.1.0)
 
 find_vcpkg_install_missing(Catch2)
