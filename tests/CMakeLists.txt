@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.30)
-project(cached_tests VERSION 0.1.0)
+project(cpp_cached_tests VERSION 0.1.0)
 
-find_vcpkg_install_missing(Catch2)
+enable_testing()
+
+find_vcpkg_install_missing(GTest gtest)
+include(GoogleTest)
+
 
 file (GLOB srcs CONFIGURE_DEPENDS *.cpp *.h cached_tests.manifest)
 if (NOT WITH_SQLITE)
@@ -18,12 +22,11 @@ endif()
 
 include_directories(..)
 
-add_executable(cached_tests ${srcs})
+add_executable(cpp_cached_tests  ${srcs})
 
-target_link_libraries(cached_tests Catch2::Catch2WithMain cpp_cached) 
+target_link_libraries(cpp_cached_tests  GTest::gtest GTest::gtest_main cpp_cached) 
 
-target_precompile_headers(cached_tests PRIVATE stdafx.h)
+target_precompile_headers(cpp_cached_tests  PRIVATE stdafx.h)
 add_definitions(-DUSING_PCH)
 
-enable_testing()
-add_test(NAME cached_main COMMAND cached_tests)
+gtest_add_tests(TARGET cpp_cached_tests)

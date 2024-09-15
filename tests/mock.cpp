@@ -1,9 +1,9 @@
 #include "../cpp_cached/mock.h"
 
 #define CATCH_CONFIG_ALL_PARTS
-#include <catch2/catch_test_macros.hpp>
+#include <gtest/gtest.h>
 
-TEST_CASE("mock", "[cache][hide]") {
+TEST(cpp_cached_tests,mock) {
 	MockCache c;
 	c.set("1", 1);
 }

@@ -1,13 +1,13 @@
 #include "../cpp_cached/disk.h"
 
 #define CATCH_CONFIG_ALL_PARTS
-#include <catch2/catch_test_macros.hpp>
+#include <gtest/gtest.h>
 #if defined(PREFERED_SERIALIZATION_cereal)
 #include <cereal/types/vector.hpp>
 #endif
 
 #if 0
-TEST_CASE("disk", "[cache][hide]")
+TEST(cpp_cached_tests,disk)
 {
   DiskCache c;
   using vi = std::vector<int>;
@@ -25,7 +25,7 @@ TEST_CASE("disk", "[cache][hide]")
   c.get<vi>(big_name);
 }
 
-TEST_CASE("disk2", "[cache][.hide]")
+TEST(cpp_cached_tests,disk2", "[cache][.hide])
 {
   DiskCache c;
   using vi = std::vector<int>;

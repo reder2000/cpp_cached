@@ -1,9 +1,9 @@
 #include "../cpp_cached/unique_type_allocator.h"
 
-#include <catch2/catch_test_macros.hpp>
+#include <gtest/gtest.h>
 
-TEST_CASE("type allocator") {
+TEST(cpp_cached_tests,type_allocator) {
     [[maybe_unused]] int* p_int = unique_type_new<int>(2);
     int* p_int_3 = unique_type_new<int>(20);
-    REQUIRE(*p_int_3 == 2);
+    EXPECT_TRUE(*p_int_3 == 2);
 }
