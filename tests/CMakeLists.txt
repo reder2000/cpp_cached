@@ -30,3 +30,6 @@ target_precompile_headers(cpp_cached_tests  PRIVATE stdafx.h)
 add_definitions(-DUSING_PCH)
 
 gtest_add_tests(TARGET cpp_cached_tests)
+
+add_custom_command( TARGET cpp_cached_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:cpp_cached_tests> $<TARGET_FILE_DIR:cpp_cached_tests> COMMAND_EXPAND_LISTS )
+add_custom_command( TARGET cpp_cached_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:cpp_cached> $<TARGET_FILE_DIR:cpp_cached_tests> COMMAND_EXPAND_LISTS )

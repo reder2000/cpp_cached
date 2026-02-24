@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cache_imp_exp.h"
+
 #if ! defined(WITH_ROCKSDB)
 #error("WITH_ROCKSDB must be defined")
 #endif
@@ -18,7 +20,7 @@
 #define ROCKSDB_NAME CACHE_NAME_PREFIX CACHE_NAME_POSTFIX
 
 // expire data in minutes, hours or days
-enum class RocksdbCacheGranularity
+enum class cpp_cached_API RocksdbCacheGranularity
 {
   minutes,
   hours,
@@ -26,10 +28,11 @@ enum class RocksdbCacheGranularity
 };
 
 // round time point to granularity
-size_t to_duration(std__chrono::utc_clock::time_point tp, RocksdbCacheGranularity rcg);
+size_t cpp_cached_API to_duration(std__chrono::utc_clock::time_point tp,
+                                 RocksdbCacheGranularity            rcg);
 
 // auxiliary metadata
-struct RocksdbValueMetaData
+struct cpp_cached_API RocksdbValueMetaData
 {
   size_t      _duration;
   std::string _type;
@@ -49,7 +52,7 @@ struct RocksdbValueMetaData
 
 
 
-class RocksDbCache
+class cpp_cached_API RocksDbCache
 {
  public:
   template <class T>

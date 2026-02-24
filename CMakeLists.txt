@@ -78,7 +78,11 @@ if (NOT WITH_ROCKSDB)
 list(FILTER srcs EXCLUDE REGEX .*rocksdb.*)
 endif()
 
+if ("${BUILD_SHARED_LIBS}" STREQUAL "ON")
+add_library (cpp_cached SHARED ${srcs} README.md)
+else()
 add_library (cpp_cached STATIC  ${srcs} README.md)
+endif()
 
 target_link_libraries(cpp_cached PUBLIC cpp_rutils::cpp_rutils ${libs} )
 
@@ -117,6 +121,7 @@ if ("${BUILD_SHARED_LIBS}" STREQUAL "ON")
     set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out )
     set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/out )
 	add_compile_definitions(BUILD_SHARED_LIBS)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE  cpp_cached_EXPORTS)
 endif()
 
 if (NOT "${cpp_cached_BUILD_TESTS}" STREQUAL "OFF")

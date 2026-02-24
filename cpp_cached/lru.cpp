@@ -19,7 +19,7 @@ void LRUCache::erase(const std::string& key)
   _map.erase(key);
 }
 
-void LRUCache::erase_symbol(const std::string_view symbol)
+cpp_cached_API void LRUCache::erase_symbol(const std::string_view symbol)
 {
   if (_map_symbol.find(symbol) == _map_symbol.end()) return;
   for (auto w : _map_symbol.find(symbol)->second)
